@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Tháp Hà Nội - Đồ án Nhóm</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+
+<body>
+
+    <!-- =================== APP CONTAINER ===================
+         Bao toàn bộ ứng dụng Tháp Hà Nội
+    ======================================================== -->
+    <div class="app-container">
+
+        <!-- =================== TOP BAR ===================
+             KHU VỰC 1: Thống kê + Điều khiển chung
+             - Số bước
+             - Chọn số đĩa
+             - Chọn tốc độ
+             - Thông tin nhóm
+        ==================================================== -->
+        <header class="top-bar">
+            
+            <!-- ===== Thống kê số bước ===== -->
+            <div class="stats-section">
+                <!-- Số bước tối thiểu (2^n - 1) -->
+                <div class="stat-box">
+                    <label>Số bước tối thiểu</label>
+                    <div class="circle-value" id="min-steps-display">0</div>
+                </div>
+                
+                <!-- Số bước hiện tại đã thực hiện -->
+                <div class="stat-box">
+                    <label>Số bước hiện tại</label>
+                    <div class="circle-value" id="current-steps-display">0</div>
+                </div>
+            </div>
+
+            <!-- ===== Điều khiển cấu hình ===== -->
+            <div class="controls-section">
+                <h1>Tower of Hanoi</h1>
+
+                <!-- Chọn số lượng đĩa -->
+                <div class="input-wrapper">
+                    <div class="label-group">
+                        <label for="disk-range">Số đĩa (3 - 8)</label>
+                        <span id="disk-count-val">5</span>
+                    </div>
+                    <input type="range" id="disk-range" min="3" max="8" value="5">
+                </div>
+
+                <!-- Chọn tốc độ animation -->
+                <div class="input-wrapper">
+                    <label for="speed-range">Speed (Slow - Medium - Fast)</label>
+                    <input type="range" id="speed-range" min="1" max="5" value="3">
+                </div>
+            </div>
+
+            <!-- ===== Thông tin nhóm ===== -->
+            <div class="info-section">
+                <div class="team-badge">
+                    <p>Tên Nhóm / MSSV</p>
+                </div>
+                <p class="hover-hint">khi ấn vào logo</p>
+            </div>
+        </header>
+
+        <hr> 
+        
+        <!-- =================== MAIN STAGE ===================
+             KHU VỰC 2: SÂN KHẤU MÔ PHỎNG
+             - 3 cọc A, B, C
+             - Đĩa di chuyển
+             - Hiển thị stack thực tế dưới mỗi cọc
+        ==================================================== -->
+        <main class="game-stage">
+
+            <!-- ===== CỌC A (Source) ===== -->
+            <div class="tower-container" id="tower-A">
+                
+                <!-- Hiển thị Stack A (DSA) -->
+                <div class="stack-view" id="stack-view-A">
+                    Hiển thị<br>stack
+                </div>
+
+                <!-- Cọc + đĩa -->
+                <div class="rod-area">
+                    <div class="pole"></div>
+                    <div class="base"></div>
+
+                    <!-- Nhóm đĩa trên cọc A -->
+                    <div class="disk-group" id="rod-A-disks">
+                        <div class="disk" style="width: 120px; background-color: #ffcccc;">3</div>
+                        <div class="disk" style="width: 100px; background-color: #ff9999;">2</div>
+                        <div class="disk" style="width: 80px;  background-color: #ff6666;">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CỌC B (Auxiliary) ===== -->
+            <div class="tower-container" id="tower-B">
+                <div class="stack-view" id="stack-view-B">
+                    Hiển thị<br>stack
+                </div>
+                <div class="rod-area">
+                    <div class="pole"></div>
+                    <div class="base"></div>
+
+                    <!-- Nhóm đĩa trên cọc B -->
+                    <div class="disk-group" id="rod-B-disks"></div>
+                </div>
+            </div>
+
+            <!-- ===== CỌC C (Destination) ===== -->
+            <div class="tower-container" id="tower-C">
+                <div class="stack-view" id="stack-view-C">
+                    Hiển thị<br>stack
+                </div>
+                <div class="rod-area">
+                    <div class="pole"></div>
+                    <div class="base"></div>
+
+                    <!-- Nhóm đĩa trên cọc C -->
+                    <div class="disk-group" id="rod-C-disks"></div>
+                </div>
+            </div>
+
+        </main>
+
+        <hr>
+
+        <!-- =================== BOTTOM BAR ===================
+             KHU VỰC 3: BỘ NÃO THUẬT TOÁN (DSA ENGINE)
+             - Nút điều khiển thuật toán
+             - Pseudocode
+             - Log & trạng thái
+        ==================================================== -->
+        <footer class="bottom-bar">
+
+            <!-- ===== Panel nút điều khiển ===== -->
+            <div class="buttons-panel">
+                <div class="btn-row">
+                    <button class="btn btn-action" id="btn-instant">Giải nhanh</button>
+                    <button class="btn btn-danger" id="btn-reset">Reset</button>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="btn-auto">Tự giải</button>
+                    <button class="btn btn-secondary" id="btn-next">Next move</button>
+                </div>
+            </div>
+
+            <!-- ===== Panel hiển thị thuật toán ===== -->
+            <div class="code-panel">
+                <h3>Hiển thị Code & Log</h3>
+                
+                <!-- Pseudocode Tháp Hà Nội (highlight theo bước) -->
+                <div class="code-content" id="algorithm-display">
+                    <p id="line-1">function Hanoi(n, A, C, B) {</p>
+                    <p id="line-2">&nbsp;&nbsp;if (n == 1) Move(1, A, C);</p>
+                    <p id="line-3">&nbsp;&nbsp;else {</p>
+                    <p id="line-4">&nbsp;&nbsp;&nbsp;&nbsp;Hanoi(n - 1, A, B, C);</p>
+                    <p id="line-5">&nbsp;&nbsp;&nbsp;&nbsp;Move(n, A, C);</p>
+                    <p id="line-6">&nbsp;&nbsp;&nbsp;&nbsp;Hanoi(n - 1, B, C, A);</p>
+                    <p id="line-7">&nbsp;&nbsp;}</p>
+                    <p id="line-8">}</p>
+                </div>
+                
+                <!-- Log trạng thái & bước hiện tại -->
+                <div id="log-message" style="margin-top: 10px; font-style: italic;">
+                    Trạng thái: Sẵn sàng...
+                </div>
+            </div>
+
+        </footer>
+
+    </div>
+
+</body>
+</html>
