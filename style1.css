@@ -17,8 +17,25 @@
 }
 
 body {
+		position: relative;
+		overflow: hidden;
+}
+
+/* Video nền toàn khung trắng */
+.app-bg-video {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		object-fit: cover;
+		z-index: -2;
+        background-color: transparent;
+}
+
+body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
+    background-color: transparent;
     color: var(--text-color);
     /* Giảm padding body để tận dụng tối đa màn hình */
     padding: 10px; 
@@ -32,13 +49,23 @@ body {
     margin: 0 auto;
     border: 1px solid #ddd;
     padding: 10px 20px; /* Giảm padding trong khung */
-    background: #fff;
+    background: rgba(255, 255, 255, 0);
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 95vh; /* Chiếm 95% chiều cao màn hình */
+}
+
+.game-stage {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    flex-grow: 1;
+    align-items: flex-end;
+    background-color: rgba(255, 255, 255, 0.75); /* Thêm màu nền xanh nhạt */
+    border-radius: 8px; /* Bo góc nhẹ cho đẹp */
 }
 
 /* Đường kẻ phân cách - Thu nhỏ margin tối đa */
@@ -72,13 +99,21 @@ hr {
     font-size: 0.85rem; /* Chữ nhỏ lại */
     font-weight: bold;
     margin-bottom: 2px;
+    color: #ffffff;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* ✅ căn giữa vòng tròn với chữ */
+    gap: 6px;              /* khoảng cách giữa chữ và vòng tròn */
 }
 
 /* Hình tròn hiển thị số - Thu nhỏ */
-.circle-value {
+.circle {
     width: 40px;  /* Giảm từ 60px xuống 40px */
     height: 40px;
-    background-color: var(--neon-green);
+    background-color: #00bbff;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -86,6 +121,15 @@ hr {
     font-weight: bold;
     font-size: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Màu riêng cho từng hình tròn */
+.circle-min {
+    background-color: #00bbff; /* Xanh dương */
+}
+
+.circle-current {
+    background-color: #ff9800; /* Cam */
 }
 
 /* --- Cột Điều Khiển Trung Tâm --- */
@@ -96,26 +140,55 @@ hr {
     align-items: center;
 }
 
+.controls-row {
+	display: flex;
+	gap: 150px;
+	justify-content: center;
+	width: 100%;
+}
+
+.controls-row .input-wrapper {
+	max-width: 200px;
+}
+
+
+.range-minmax {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
 .controls-section h1 {
-    margin-bottom: 10px; /* Giảm khoảng cách dưới tiêu đề */
-    font-size: 1.5rem;   /* Giảm size chữ tiêu đề */
+    margin-bottom: 70px; /* Giảm khoảng cách dưới tiêu đề */
+    font-size: 2.3rem;   /* Giảm size chữ tiêu đề */
     text-transform: uppercase;
     letter-spacing: 1px;
+    color: #00e5ff;
 }
 
 .input-wrapper {
-    margin-bottom: 5px; /* Giảm khoảng cách giữa 2 thanh trượt */
+    margin-bottom: 10px; /* Giảm khoảng cách giữa 2 thanh trượt */
     width: 100%;
     max-width: 350px;
     text-align: center;
 }
 
 .label-group {
+    position: relative;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;   /* chữ ở giữa */
     font-weight: bold;
     margin-bottom: 2px;
     font-size: 0.9rem;
+    color: #ffffff;
+}
+
+.label-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;          /* Khoảng cách nhỏ giữa chữ và số */
 }
 
 input[type=range] {
@@ -132,17 +205,18 @@ input[type=range] {
     align-items: flex-end;
 }
 
-/* Hình elip logo nhóm - Thu nhỏ */
 .team-badge {
-    background-color: var(--neon-green);
-    padding: 15px 10px; /* Giảm padding */
-    border-radius: 50px; 
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    cursor: pointer;
+	background: transparent;
+	padding: 0;
+	box-shadow: none;
+    margin-right: -50px;   /* chỉnh số âm để sát lề hơn */
+}
+
+.team-badge img {
+	width: 300px;      /* chỉnh to/nhỏ tại đây */
+	height: auto;
+	object-fit: contain;
+	border-radius: 0;  /* không bo tròn */
 }
 
 .hover-hint {
@@ -167,14 +241,16 @@ input[type=range] {
 .tower-container {
     display: flex;
     align-items: flex-end;
-    gap: 5px;
+    gap: 30px;
 }
 
 /* Thanh hiển thị Stack - Thu nhỏ chiều cao */
 .stack-view {
     width: 50px;
-    height: 180px; /* Giảm từ 250px xuống 180px */
-    background-color: var(--neon-green);
+    height: 210px; /* Giảm từ 250px xuống 180px */
+    background-color: transparent; /* Trong suốt */
+    border: 2px solid #000000; /* Khung đen */
+    border-top: none; /* Bỏ nắp trên */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -182,7 +258,7 @@ input[type=range] {
     font-weight: bold;
     font-size: 0.8rem;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 0; /* Bỏ bo tròn = góc vuông */
 }
 
 /* Khu vực chứa Cọc và Đĩa */
@@ -199,8 +275,8 @@ input[type=range] {
 /* Cây cột sắt */
 .pole {
     width: 10px;
-    height: 160px; /* Giảm chiều cao cột */
-    background-color: var(--rod-color);
+    height: 200px; /* Giảm chiều cao cột */
+    background-color: #727272;
     border-radius: 10px 10px 0 0;
     position: absolute;
     bottom: 15px;
@@ -209,7 +285,7 @@ input[type=range] {
 
 /* Đế tròn */
 .base {
-    width: 140px; /* Thu nhỏ đế */
+    width: 200px; /* Thu nhỏ đế */
     height: 15px;
     background-color: var(--base-color);
     border-radius: 10px;
@@ -279,7 +355,6 @@ input[type=range] {
     font-weight: bold;
     cursor: pointer;
     border: 3px solid var(--light-purple);
-    background-color: var(--neon-green);
     color: #000;
     font-size: 0.8rem; /* Chữ nhỏ hơn */
     white-space: nowrap; /* Không xuống dòng chữ trong nút */
@@ -290,12 +365,38 @@ input[type=range] {
     filter: brightness(1.05);
 }
 
+/* Màu riêng cho từng nút */
+.btn-action {
+    background-color: #00ff08; /* Cam - Giải nhanh */
+    border-color: #fffdfd;
+}
+
+.btn-danger {
+    background-color: #ff1919; /* Đỏ - Reset */
+    border-color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #ffd000; /* Xanh lá - Tự giải */
+    border-color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: #1d99ff; /* Xanh dương - Next move */
+    border-color: #ffffff;
+}
+
 /* Panel Code - 80% Size & Scroll */
 .code-panel {
-    flex-grow: 1;
-    background-color: var(--neon-green);
+    flex-grow: 0;
+    width: 500px; /* Giới hạn chiều rộng */
+    margin-left: auto;
+    background-color: rgba(255,255,255,0);
+    color: #00ff59;
     padding: 10px;
     border-radius: 8px;
+    border: 3px solid var(--neon-green);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Để xử lý phần tràn bên trong */
@@ -304,13 +405,14 @@ input[type=range] {
 .code-panel h3 {
     margin-bottom: 5px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    color: #00eeff;
 }
 
 .code-content {
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 0.85rem; /* Giảm cỡ chữ code */
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0);
     padding: 8px;
     border-radius: 5px;
     flex-grow: 1;

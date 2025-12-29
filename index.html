@@ -8,7 +8,9 @@
 </head>
 
 <body>
-
+    <video class="app-bg-video" autoplay muted loop>
+			<source src="nen.mp4" type="video/mp4">
+	</video>
     <!-- =================== APP CONTAINER ===================
          Bao toàn bộ ứng dụng Tháp Hà Nội
     ======================================================== -->
@@ -28,42 +30,61 @@
                 <!-- Số bước tối thiểu (2^n - 1) -->
                 <div class="stat-box">
                     <label>Số bước tối thiểu</label>
-                    <div class="circle-value" id="min-steps-display">0</div>
+                    <div class="circle circle-min" id="min-steps-display">0</div>
                 </div>
                 
                 <!-- Số bước hiện tại đã thực hiện -->
                 <div class="stat-box">
                     <label>Số bước hiện tại</label>
-                    <div class="circle-value" id="current-steps-display">0</div>
+                    <div class="circle circle-current" id="current-steps-display">0</div>
                 </div>
             </div>
 
             <!-- ===== Điều khiển cấu hình ===== -->
-            <div class="controls-section">
-                <h1>Tower of Hanoi</h1>
+			<div class="controls-section">
+				<h1>Tower of Hanoi</h1>
 
-                <!-- Chọn số lượng đĩa -->
-                <div class="input-wrapper">
-                    <div class="label-group">
-                        <label for="disk-range">Số đĩa (3 - 8)</label>
-                        <span id="disk-count-val">5</span>
-                    </div>
-                    <input type="range" id="disk-range" min="3" max="8" value="5">
-                </div>
+				<div class="controls-row">
+					<!-- Chọn số lượng đĩa -->
+					<div class="input-wrapper">
+						<div class="label-group">
+							<label for="disk-range">
+								Số đĩa: <span id="disk-count-val">5</span>
+							</label>
+						</div>
 
-                <!-- Chọn tốc độ animation -->
-                <div class="input-wrapper">
-                    <label for="speed-range">Speed (Slow - Medium - Fast)</label>
-                    <input type="range" id="speed-range" min="1" max="5" value="3">
-                </div>
-            </div>
+						<div class="range-minmax">
+							<span>3</span>
+							<span>8</span>
+						</div>
+
+						<input type="range" id="disk-range" min="3" max="8" value="5">
+					</div>
+
+					<!-- Chọn tốc độ animation -->
+					<div class="input-wrapper">
+						<div class="label-group">
+							<label for="speed-range">
+								Speed: <span id="speed-text">Medium</span>
+							</label>
+						</div>
+
+						<div class="range-minmax">
+							<span>Slow</span>
+							<span>Fast</span>
+						</div>
+
+						<input type="range" id="speed-range" min="1" max="5" value="3">
+					</div>
+				</div>
+			</div>
+
 
             <!-- ===== Thông tin nhóm ===== -->
             <div class="info-section">
                 <div class="team-badge">
-                    <p>Tên Nhóm / MSSV</p>
+                    <img src="logo.png" alt="Logo nhóm">
                 </div>
-                <p class="hover-hint">khi ấn vào logo</p>
             </div>
         </header>
 
@@ -92,9 +113,14 @@
 
                     <!-- Nhóm đĩa trên cọc A -->
                     <div class="disk-group" id="rod-A-disks">
-                        <div class="disk" style="width: 120px; background-color: #ffcccc;">3</div>
-                        <div class="disk" style="width: 100px; background-color: #ff9999;">2</div>
-                        <div class="disk" style="width: 80px;  background-color: #ff6666;">1</div>
+                        <div class="disk" style="width: 180px; background-color: #ff0000;">1</div>
+                        <div class="disk" style="width: 160px; background-color: #fe7700;">2</div>
+                        <div class="disk" style="width: 140px;  background-color: #fff700;">3</div>
+                        <div class="disk" style="width: 120px; background-color: #ff00bf;">4</div>
+                        <div class="disk" style="width: 100px; background-color: #053fff;">5</div>
+                        <div class="disk" style="width: 80px;  background-color: #33ff00;">6</div>
+                        <div class="disk" style="width: 60px; background-color: #00eeff;">7</div>
+                        <div class="disk" style="width: 40px;  background-color: #ececec;">8</div>
                     </div>
                 </div>
             </div>
@@ -166,11 +192,7 @@
                     <p id="line-7">&nbsp;&nbsp;}</p>
                     <p id="line-8">}</p>
                 </div>
-                
-                <!-- Log trạng thái & bước hiện tại -->
-                <div id="log-message" style="margin-top: 10px; font-style: italic;">
-                    Trạng thái: Sẵn sàng...
-                </div>
+
             </div>
 
         </footer>
