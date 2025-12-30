@@ -45,7 +45,7 @@ body {
 
 /* Container chính - Thu nhỏ lại */
 .app-container {
-    max-width: 1100px; /* Thu hẹp chiều ngang một chút */
+    max-width: 1500px; /* Thu hẹp chiều ngang một chút */
     margin: 0 auto;
     border: 1px solid #ddd;
     padding: 10px 20px; /* Giảm padding trong khung */
@@ -54,27 +54,10 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     height: 95vh; /* Chiếm 95% chiều cao màn hình */
 }
 
-.game-stage {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    flex-grow: 1;
-    align-items: flex-end;
-    background-color: rgba(255, 255, 255, 0.75); /* Thêm màu nền xanh nhạt */
-    border-radius: 8px; /* Bo góc nhẹ cho đẹp */
-}
-
-/* Đường kẻ phân cách - Thu nhỏ margin tối đa */
-hr {
-    border: 0;
-    height: 1px;
-    background: #e0e0e0;
-    margin: 5px 0; /* Giảm khoảng cách giữa các phần xuống tối thiểu */
-}
 
 /* =========================================================
    2. TOP BAR (HEADER) - THU NHỎ
@@ -84,8 +67,11 @@ hr {
     justify-content: space-between;
     align-items: center; /* Căn giữa theo chiều dọc */
     gap: 15px;
-    padding-bottom: 5px;
+    padding-bottom: 0;
+    
 }
+
+
 
 /* --- Cột Thống Kê --- */
 .stats-section {
@@ -161,8 +147,9 @@ hr {
 }
 
 .controls-section h1 {
-    margin-bottom: 70px; /* Giảm khoảng cách dưới tiêu đề */
-    font-size: 2.3rem;   /* Giảm size chữ tiêu đề */
+    margin-bottom: 40px; /* Giảm khoảng cách dưới tiêu đề */
+    margin-top: -50px;
+    font-size: 2.5rem;   /* Giảm size chữ tiêu đề */
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #00e5ff;
@@ -233,10 +220,24 @@ input[type=range] {
 .game-stage {
     display: flex;
     justify-content: space-around;
-    padding: 10px 0; /* Giảm padding trên dưới cực mạnh (từ 40px xuống 10px) */
-    flex-grow: 1; /* Tự động co giãn để lấp đầy khoảng trống */
-    align-items: flex-end; /* Căn đáy các cọc */
+    align-items: flex-end;
+
+    /* chiều cao */
+    flex-grow: 1;
+
+    /* nền trắng */
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 15px;
+
+    /* khoảng cách */
+    padding-top: 0;
+    padding-bottom: 5px;
+
+    /* kéo sát lên header */
+    margin-top: -30px;
+    margin-bottom: 10px;
 }
+
 
 .tower-container {
     display: flex;
@@ -328,13 +329,14 @@ input[type=range] {
     display: flex;
     gap: 15px;
     align-items: stretch; /* Kéo dãn chiều cao bằng nhau */
-    height: 130px; /* Giới hạn chiều cao cố định cho footer */
+    height: 170px; /* Giới hạn chiều cao cố định cho footer */
     overflow: hidden; /* Ẩn phần tràn nếu có */
 }
 
 /* Panel Nút Bấm */
 .buttons-panel {
     display: flex;
+    margin-left: auto;
     flex-direction: column;
     gap: 8px; /* Giảm khoảng cách giữa các hàng nút */
     width: 200px; /* Cố định chiều rộng để không bị bè */
@@ -344,21 +346,27 @@ input[type=range] {
 .btn-row {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    gap: 20px;
+    height: 50px;
 }
 
 /* Nút bấm - Nhỏ gọn */
 .btn {
     flex: 1;
-    padding: 8px 5px; /* Giảm padding nút */
-    border-radius: 15px;
+    height: 100%;
+    width: 120px;
+    flex: none;
+    min-height: 50px;
+    border-radius: 18px;
     font-weight: bold;
     cursor: pointer;
     border: 3px solid var(--light-purple);
     color: #000;
-    font-size: 0.8rem; /* Chữ nhỏ hơn */
-    white-space: nowrap; /* Không xuống dòng chữ trong nút */
+    font-size: 1.2rem;
+    white-space: nowrap;
+    
 }
+
 
 .btn:hover {
     transform: translateY(-1px);
