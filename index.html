@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="style1.css">
 </head>
 
+
 <body>
+
 
     <!-- =================== APP CONTAINER ===================
          Bao toàn bộ ứng dụng Tháp Hà Nội
@@ -22,7 +25,7 @@
              - Thông tin nhóm
         ==================================================== -->
         <header class="top-bar">
-            
+
             <!-- ===== Thống kê số bước ===== -->
             <div class="stats-section">
                 <!-- Số bước tối thiểu (2^n - 1) -->
@@ -30,7 +33,7 @@
                     <label>Số bước tối thiểu</label>
                     <div class="circle-value" id="min-steps-display">0</div>
                 </div>
-                
+
                 <!-- Số bước hiện tại đã thực hiện -->
                 <div class="stat-box">
                     <label>Số bước hiện tại</label>
@@ -67,8 +70,8 @@
             </div>
         </header>
 
-        <hr> 
-        
+        <hr>
+
         <!-- =================== MAIN STAGE ===================
              KHU VỰC 2: SÂN KHẤU MÔ PHỎNG
              - 3 cọc A, B, C
@@ -79,7 +82,7 @@
 
             <!-- ===== CỌC A (Source) ===== -->
             <div class="tower-container" id="tower-A">
-                
+
                 <!-- Hiển thị Stack A (DSA) -->
                 <div class="stack-view" id="stack-view-A">
                     Hiển thị<br>stack
@@ -154,7 +157,7 @@
             <!-- ===== Panel hiển thị thuật toán ===== -->
             <div class="code-panel">
                 <h3>Hiển thị Code & Log</h3>
-                
+
                 <!-- Pseudocode Tháp Hà Nội (highlight theo bước) -->
                 <div class="code-content" id="algorithm-display">
                     <p id="line-1">function Hanoi(n, A, C, B) {</p>
@@ -166,7 +169,7 @@
                     <p id="line-7">&nbsp;&nbsp;}</p>
                     <p id="line-8">}</p>
                 </div>
-                
+
                 <!-- Log trạng thái & bước hiện tại -->
                 <div id="log-message" style="margin-top: 10px; font-style: italic;">
                     Trạng thái: Sẵn sàng...
@@ -176,6 +179,9 @@
         </footer>
 
     </div>
-
+    <script src="hanoiAlgorithm.js"></script>
+    <script src="hanoiLogic.js"></script>
+    <script src="hanoiUI.js"></script>
 </body>
+
 </html>
