@@ -242,13 +242,13 @@ input[type=range] {
 .tower-container {
     display: flex;
     align-items: flex-end;
-    gap: 30px;
+    gap: 60px;
 }
 
 /* Thanh hiển thị Stack - Thu nhỏ chiều cao */
 .stack-view {
     width: 50px;
-    height: 210px; /* Giảm từ 250px xuống 180px */
+    height: 240px; /* Giảm từ 250px xuống 180px */
     background-color: transparent; /* Trong suốt */
     border: 2px solid #000000; /* Khung đen */
     border-top: none; /* Bỏ nắp trên */
@@ -276,7 +276,7 @@ input[type=range] {
 /* Cây cột sắt */
 .pole {
     width: 10px;
-    height: 200px; /* Giảm chiều cao cột */
+    height: 220px; /* Giảm chiều cao cột */
     background-color: #727272;
     border-radius: 10px 10px 0 0;
     position: absolute;
@@ -286,7 +286,7 @@ input[type=range] {
 
 /* Đế tròn */
 .base {
-    width: 200px; /* Thu nhỏ đế */
+    width: 240px; /* Thu nhỏ đế */
     height: 15px;
     background-color: var(--base-color);
     border-radius: 10px;
