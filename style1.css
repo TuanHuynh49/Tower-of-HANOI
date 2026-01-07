@@ -78,11 +78,12 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 150px; /* Thu hẹp chiều rộng */
+    width: 200px; /* Thu hẹp chiều rộng */
+    margin-top: -30px; /* ← Thêm dòng này để kéo lên */
 }
 
 .stat-box label {
-    font-size: 0.85rem; /* Chữ nhỏ lại */
+    font-size: 1.2rem; /* Chữ nhỏ lại */
     font-weight: bold;
     margin-bottom: 2px;
     color: #ffffff;
@@ -97,7 +98,7 @@ body {
 
 /* Hình tròn hiển thị số - Thu nhỏ */
 .circle {
-    width: 40px;  /* Giảm từ 60px xuống 40px */
+    width: 60px;  /* Giảm từ 60px xuống 40px */
     height: 40px;
     background-color: #00bbff;
     border-radius: 50%;
@@ -105,7 +106,7 @@ body {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.2rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -176,6 +177,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 5px;          /* Khoảng cách nhỏ giữa chữ và số */
+    font-size: 1.2rem;
 }
 
 input[type=range] {
@@ -196,7 +198,8 @@ input[type=range] {
 	background: transparent;
 	padding: 0;
 	box-shadow: none;
-    margin-right: -50px;   /* chỉnh số âm để sát lề hơn */
+    margin-right: -80px;   /* chỉnh số âm để sát lề hơn */
+    /* top: 100px; */
 }
 
 .team-badge img {
@@ -204,6 +207,7 @@ input[type=range] {
 	height: auto;
 	object-fit: contain;
 	border-radius: 0;  /* không bo tròn */
+
 }
 
 .hover-hint {

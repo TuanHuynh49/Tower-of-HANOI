@@ -1,26 +1,194 @@
 /* =========================================================
-   ALGORITHM.JS - Thuật toán đệ quy Tháp Hà Nội
+   ALGORITHM.JS - Thuật toán đệ quy Tháp Hà Nội với Stack
    ========================================================= */
 
 /**
- * Class xử lý thuật toán Tháp Hà Nội
+ * Class Stack - Cấu trúc dữ liệu ngăn xếp
+ */
+class Stack {
+    constructor(name) {
+        this.name = name;  // Tên stack (A, B, C)
+        this.items = [];   // Mảng chứa các phần tử
+    }
+
+    /**
+     * Thêm phần tử vào đỉnh stack
+     * @param {*} element - Phần tử cần thêm
+     */
+    push(element) {
+        this.items.push(element);
+    }
+
+    /**
+     * Lấy và xóa phần tử ở đỉnh stack
+     * @returns {*} - Phần tử ở đỉnh hoặc null nếu stack rỗng
+     */
+    pop() {
+        if (this.isEmpty()) {
+            console.log(`Stack ${this.name}: POP() → Stack rỗng!`);
+            return null;
+        }
+        const element = this.items.pop();
+        console.log(`Stack ${this.name}: POP() → ${element}, còn lại [${this.items.join(', ')}]`);
+        return element;
+    }
+
+    /**
+     * Xem phần tử ở đỉnh stack mà không xóa
+     * @returns {*} - Phần tử ở đỉnh hoặc null
+     */
+    peek() {
+        if (this.isEmpty()) {
+            return null;
+        }
+        return this.items[this.items.length - 1];
+    }
+
+    /**
+     * Kiểm tra stack có rỗng không
+     * @returns {boolean}
+     */
+    isEmpty() {
+        return this.items.length === 0;
+    }
+
+    /**
+     * Lấy kích thước stack
+     * @returns {number}
+     */
+    size() {
+        return this.items.length;
+    }
+
+    /**
+     * Xóa tất cả phần tử trong stack
+     */
+    clear() {
+        this.items = [];
+        console.log(`Stack ${this.name}: CLEAR() → Stack đã được xóa`);
+    }
+
+    /**
+     * Hiển thị stack dưới dạng chuỗi
+     * @returns {string}
+     */
+    toString() {
+        return `Stack ${this.name}: [${this.items.join(', ')}]`;
+    }
+
+    /**
+     * Lấy toàn bộ mảng items (dùng để render UI)
+     * @returns {Array}
+     */
+    getItems() {
+        return [...this.items];  // Trả về bản sao
+    }
+}
+
+/**
+ * Class xử lý thuật toán Tháp Hà Nội với Stack
  */
 class HanoiAlgorithm {
     constructor() {
+        this.stackA = new Stack('A');
+        this.stackB = new Stack('B');
+        this.stackC = new Stack('C');
         this.moves = [];  // Danh sách các bước di chuyển
         this.currentLine = 0;  // Dòng code đang thực thi
     }
 
     /**
+     * Khởi tạo các stack với n đĩa
+     * @param {number} n - Số lượng đĩa
+     */
+    initStacks(n) {
+        this.stackA.clear();
+        this.stackB.clear();
+        this.stackC.clear();
+        
+        // Push các đĩa vào stack A (từ lớn đến nhỏ: n, n-1, ..., 1)
+        console.log(`\n=== Khởi tạo ${n} đĩa trên Stack A ===`);
+        for (let i = n; i >= 1; i--) {
+            this.stackA.push(i);
+        }
+        console.log(`Trạng thái ban đầu:`);
+        console.log(this.stackA.toString());
+        console.log(this.stackB.toString());
+        console.log(this.stackC.toString());
+    }
+
+    /**
+     * Lấy stack theo tên
+     * @param {string} stackName - Tên stack (A, B, C)
+     * @returns {Stack}
+     */
+    getStack(stackName) {
+        switch(stackName) {
+            case 'A': return this.stackA;
+            case 'B': return this.stackB;
+            case 'C': return this.stackC;
+            default: throw new Error(`Stack ${stackName} không tồn tại`);
+        }
+    }
+
+    /**
+     * Di chuyển đĩa từ stack này sang stack khác
+     * @param {string} from - Stack nguồn
+     * @param {string} to - Stack đích
+     * @param {number} line - Dòng code tương ứng
+     * @returns {Object|null} - Thông tin di chuyển hoặc null nếu không hợp lệ
+     */
+    moveDisk(from, to, line) {
+        const fromStack = this.getStack(from);
+        const toStack = this.getStack(to);
+
+        // Kiểm tra stack nguồn có đĩa không
+        if (fromStack.isEmpty()) {
+            console.log(`❌ Không thể di chuyển: Stack ${from} rỗng`);
+            return null;
+        }
+
+        const disk = fromStack.peek();
+        const topDisk = toStack.peek();
+
+        // Kiểm tra quy tắc: không được đặt đĩa lớn lên đĩa nhỏ
+        if (topDisk !== null && disk > topDisk) {
+            console.log(`❌ Không thể di chuyển đĩa ${disk} lên đĩa ${topDisk}`);
+            return null;
+        }
+
+        // Thực hiện di chuyển: POP từ nguồn, PUSH vào đích
+        console.log(`\n→ Di chuyển đĩa ${disk} từ ${from} sang ${to}`);
+        const movedDisk = fromStack.pop();
+        toStack.push(movedDisk);
+
+        // Lưu bước di chuyển
+        const move = {
+            disk: disk,
+            from: from,
+            to: to,
+            line: line,
+            description: `Di chuyển đĩa ${disk} từ ${from} sang ${to}`
+        };
+        this.moves.push(move);
+
+        return move;
+    }
+
+    /**
      * Thuật toán đệ quy giải Tháp Hà Nội
      * @param {number} n - Số đĩa cần di chuyển
-     * @param {string} source - Cọc nguồn (A, B, C)
-     * @param {string} destination - Cọc đích (A, B, C)
-     * @param {string} auxiliary - Cọc trung gian (A, B, C)
+     * @param {string} source - Stack nguồn (A, B, C)
+     * @param {string} destination - Stack đích (A, B, C)
+     * @param {string} auxiliary - Stack trung gian (A, B, C)
      */
     solveHanoi(n, source, destination, auxiliary) {
+        console.log(`\n=== Bắt đầu giải Tháp Hà Nội với ${n} đĩa ===`);
         this.moves = [];  // Reset danh sách moves
+        this.initStacks(n);  // Khởi tạo stack
         this.hanoiRecursive(n, source, destination, auxiliary);
+        
+        console.log(`\n=== Hoàn thành! Tổng số bước: ${this.moves.length} ===`);
         return this.moves;
     }
 
@@ -30,34 +198,17 @@ class HanoiAlgorithm {
     hanoiRecursive(n, source, destination, auxiliary) {
         if (n === 1) {
             // Base case: Di chuyển 1 đĩa trực tiếp
-            this.addMove(1, source, destination, 2);
+            this.moveDisk(source, destination, 2);
         } else {
-            // Bước 1: Di chuyển (n-1) đĩa từ source sang auxiliary
+            // Bước 1: Di chuyển (n-1) đĩa từ source sang auxiliary (dùng destination làm trung gian)
             this.hanoiRecursive(n - 1, source, auxiliary, destination);
             
             // Bước 2: Di chuyển đĩa lớn nhất từ source sang destination
-            this.addMove(n, source, destination, 5);
+            this.moveDisk(source, destination, 5);
             
-            // Bước 3: Di chuyển (n-1) đĩa từ auxiliary sang destination
+            // Bước 3: Di chuyển (n-1) đĩa từ auxiliary sang destination (dùng source làm trung gian)
             this.hanoiRecursive(n - 1, auxiliary, destination, source);
         }
-    }
-
-    /**
-     * Thêm một bước di chuyển vào danh sách
-     * @param {number} disk - Số đĩa cần di chuyển
-     * @param {string} from - Cọc nguồn
-     * @param {string} to - Cọc đích
-     * @param {number} line - Dòng code tương ứng
-     */
-    addMove(disk, from, to, line) {
-        this.moves.push({
-            disk: disk,
-            from: from,
-            to: to,
-            line: line,
-            description: `Di chuyển đĩa ${disk} từ ${from} sang ${to}`
-        });
     }
 
     /**
@@ -94,12 +245,28 @@ class HanoiAlgorithm {
     }
 
     /**
+     * Lấy trạng thái hiện tại của tất cả stack
+     * @returns {Object}
+     */
+    getStacksState() {
+        return {
+            A: this.stackA.getItems(),
+            B: this.stackB.getItems(),
+            C: this.stackC.getItems()
+        };
+    }
+
+    /**
      * Reset algorithm
      */
     reset() {
+        this.stackA.clear();
+        this.stackB.clear();
+        this.stackC.clear();
         this.moves = [];
         this.currentLine = 0;
         this.highlightLine(0);  // Xóa highlight
+        console.log('\n=== Algorithm đã được reset ===');
     }
 }
 

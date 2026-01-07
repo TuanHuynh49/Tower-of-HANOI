@@ -1,5 +1,5 @@
 /* =========================================================
-   HANOIUI.JS - Giao diện và Animation
+   HANOIUI.JS - Giao diện và Animation (với chế độ chơi thủ công)
    ========================================================= */
 
 /**
@@ -32,6 +32,11 @@ class HanoiUI {
         this.diskBaseWidth = 20;  // Width tối thiểu cho đĩa nhỏ nhất
         this.diskWidthIncrement = 20;  // Tăng thêm cho mỗi đĩa
         this.diskHeight = 20;
+
+        // Chế độ chơi thủ công
+        this.manualMode = false;
+        this.selectedDisk = null;
+        this.selectedRod = null;
     }
 
     /**
@@ -68,19 +73,191 @@ class HanoiUI {
             this.resetGame();
         });
 
-        // Nút Giải nhanh (Instant)
+        // Nút Máy giải (Auto with animation)
         document.getElementById('btn-instant').addEventListener('click', () => {
-            this.solveInstant();
+            this.toggleAutoPlay();
         });
 
-        // Nút Tự giải (Auto)
+        // Nút Tự giải (Manual Play Mode)
         document.getElementById('btn-auto').addEventListener('click', () => {
-            this.toggleAutoPlay();
+            this.toggleManualMode();
         });
 
         // Nút Next move
         document.getElementById('btn-next').addEventListener('click', () => {
             this.nextMove();
+        });
+    }
+
+    /**
+     * Bật/tắt chế độ chơi thủ công
+     */
+    toggleManualMode() {
+        const btn = document.getElementById('btn-auto');
+        
+        if (this.manualMode) {
+            // Tắt chế độ thủ công
+            this.manualMode = false;
+            this.selectedDisk = null;
+            this.selectedRod = null;
+            btn.textContent = 'Manual Play';
+            btn.style.backgroundColor = '#ffd000';
+            
+            // Xóa event listeners
+            this.removeManualEventListeners();
+            
+            // Xóa highlight
+            this.clearDiskHighlights();
+        } else {
+            // Bật chế độ thủ công
+            this.manualMode = true;
+            btn.textContent = 'Exit Manual';
+            btn.style.backgroundColor = '#ff6600';
+            
+            // Thêm event listeners cho đĩa và cọc
+            this.setupManualEventListeners();
+            
+            alert('🎮 Chế độ chơi thủ công!\n\n1. Click vào đĩa trên cùng của một cọc\n2. Click vào cọc đích để di chuyển');
+        }
+    }
+
+    /**
+     * Setup event listeners cho chế độ chơi thủ công
+     */
+    setupManualEventListeners() {
+        // Event listeners cho các cọc
+        ['A', 'B', 'C'].forEach(rod => {
+            const rodArea = document.getElementById(`tower-${rod}`);
+            
+            rodArea.addEventListener('click', (e) => {
+                if (!this.manualMode) return;
+                this.handleRodClick(rod);
+            });
+
+            // Hover effect
+            rodArea.addEventListener('mouseenter', () => {
+                if (!this.manualMode) return;
+                rodArea.style.opacity = '0.8';
+                rodArea.style.cursor = 'pointer';
+            });
+
+            rodArea.addEventListener('mouseleave', () => {
+                rodArea.style.opacity = '1';
+                rodArea.style.cursor = 'default';
+            });
+        });
+    }
+
+    /**
+     * Xóa event listeners cho chế độ thủ công
+     */
+    removeManualEventListeners() {
+        ['A', 'B', 'C'].forEach(rod => {
+            const rodArea = document.getElementById(`tower-${rod}`);
+            const newRodArea = rodArea.cloneNode(true);
+            rodArea.parentNode.replaceChild(newRodArea, rodArea);
+        });
+    }
+
+    /**
+     * Xử lý click vào cọc
+     */
+    async handleRodClick(rod) {
+        const state = hanoiLogic.getState();
+        const stack = state.stacks[rod];
+
+        if (this.selectedRod === null) {
+            // Chưa chọn cọc nào - Chọn cọc nguồn
+            if (stack.length === 0) {
+                alert('⚠️ Cọc này không có đĩa!');
+                return;
+            }
+
+            // Chọn cọc nguồn
+            this.selectedRod = rod;
+            this.selectedDisk = stack[stack.length - 1];
+            
+            // Highlight đĩa được chọn
+            this.highlightTopDisk(rod);
+            
+            console.log(`Đã chọn đĩa ${this.selectedDisk} từ cọc ${rod}`);
+        } else {
+            // Đã chọn cọc nguồn - Chọn cọc đích
+            if (rod === this.selectedRod) {
+                // Click lại cọc đang chọn - Hủy chọn
+                this.selectedRod = null;
+                this.selectedDisk = null;
+                this.clearDiskHighlights();
+                console.log('Đã hủy chọn');
+                return;
+            }
+
+            // Thực hiện di chuyển
+            const fromRod = this.selectedRod;
+            const toRod = rod;
+            const disk = this.selectedDisk;
+
+            // Kiểm tra tính hợp lệ
+            const fromStack = state.stacks[fromRod];
+            const toStack = state.stacks[toRod];
+            const topDisk = toStack.length > 0 ? toStack[toStack.length - 1] : null;
+            
+            if (topDisk !== null && disk > topDisk) {
+                // Di chuyển không hợp lệ
+                alert('❌ Không thể di chuyển!\n\nKhông được đặt đĩa lớn lên đĩa nhỏ.');
+                
+                // Clear highlights
+                this.clearDiskHighlights();
+                
+                // Reset selection
+                this.selectedRod = null;
+                this.selectedDisk = null;
+            } else {
+                // Di chuyển hợp lệ
+                console.log(`✅ Di chuyển đĩa ${disk} từ ${fromRod} sang ${toRod}`);
+                
+                // Clear highlights
+                this.clearDiskHighlights();
+                
+                // Animation (với executeMove = true để thực hiện logic)
+                await this.animateMove(disk, fromRod, toRod, true);
+                
+                // Reset selection
+                this.selectedRod = null;
+                this.selectedDisk = null;
+                
+                // Kiểm tra hoàn thành
+                if (hanoiLogic.isCompleted()) {
+                    setTimeout(() => {
+                        alert(`🎉 Chúc mừng! Bạn đã hoàn thành!\n\nSố bước: ${state.currentSteps}\nTối thiểu: ${state.minSteps}`);
+                    }, 300);
+                }
+            }
+        }
+    }
+
+    /**
+     * Highlight đĩa trên cùng của cọc
+     */
+    highlightTopDisk(rod) {
+        this.clearDiskHighlights();
+        const container = document.getElementById(`rod-${rod}-disks`);
+        const disks = container.querySelectorAll('.disk');
+        if (disks.length > 0) {
+            const topDisk = disks[disks.length - 1];
+            topDisk.style.border = '3px solid #ffff00';
+            topDisk.style.boxShadow = '0 0 15px #ffff00';
+        }
+    }
+
+    /**
+     * Clear tất cả highlight đĩa
+     */
+    clearDiskHighlights() {
+        const allDisks = document.querySelectorAll('.disk');
+        allDisks.forEach(disk => {
+            disk.style.border = '1px solid rgba(0,0,0,0.1)';
+            disk.style.boxShadow = 'none';
         });
     }
 
@@ -141,9 +318,10 @@ class HanoiUI {
      * @param {number} diskNumber - Số đĩa
      * @param {string} from - Cọc nguồn
      * @param {string} to - Cọc đích
+     * @param {boolean} executeMove - Có thực hiện logic di chuyển không (default: true)
      * @returns {Promise}
      */
-    async animateMove(diskNumber, from, to) {
+    async animateMove(diskNumber, from, to, executeMove = true) {
         return new Promise((resolve) => {
             const speed = hanoiLogic.getAnimationSpeed();
             const fromContainer = document.getElementById(`rod-${from}-disks`);
@@ -201,8 +379,10 @@ class HanoiUI {
                 // Xóa clone
                 cloneDisk.remove();
                 
-                // Thực hiện di chuyển logic
-                hanoiLogic.makeMove(from, to);
+                // Thực hiện logic di chuyển nếu cần
+                if (executeMove) {
+                    hanoiLogic.makeMove(from, to);
+                }
                 
                 // Render lại
                 this.renderGame();
@@ -249,46 +429,30 @@ class HanoiUI {
         this.updateStats();
         hanoiAlgorithm.reset();
         
-        // Đổi text nút Auto về ban đầu
-        document.getElementById('btn-auto').textContent = 'Tự giải';
+        // Reset manual mode
+        this.selectedDisk = null;
+        this.selectedRod = null;
+        this.clearDiskHighlights();
+        
+        // Đổi text nút về ban đầu
+        document.getElementById('btn-instant').textContent = 'Auto Solve';
     }
 
     /**
-     * Giải nhanh không animation
-     */
-    async solveInstant() {
-        const numDisks = hanoiLogic.getState().numDisks;
-        hanoiLogic.initGame(numDisks);
-        hanoiLogic.generateMoves();
-
-        // Thực hiện tất cả moves
-        while (!hanoiLogic.isCompleted()) {
-            const move = hanoiLogic.getNextMove();
-            if (!move) break;
-            
-            hanoiLogic.makeMove(move.from, move.to);
-        }
-
-        this.renderGame();
-        this.updateStats();
-    }
-
-    /**
-     * Bật/tắt chế độ tự động
+     * Máy giải - Tự động giải từng bước với animation
      */
     async toggleAutoPlay() {
         const state = hanoiLogic.getState();
-        const btn = document.getElementById('btn-auto');
+        const btn = document.getElementById('btn-instant');
 
         if (state.isAutoPlaying) {
-            // Dừng auto play
+            // Dừng máy giải
             state.isAutoPlaying = false;
-            btn.textContent = 'Tự giải';
+            btn.textContent = 'Auto Solve';
         } else {
-            // Bắt đầu auto play
+            // Bắt đầu máy giải
             state.isAutoPlaying = true;
-            btn.textContent = 'Dừng';
-
+            btn.textContent = 'Stop';
             // Generate moves nếu chưa có
             if (state.moves.length === 0) {
                 hanoiLogic.generateMoves();
@@ -302,8 +466,8 @@ class HanoiUI {
                 // Highlight code line
                 hanoiAlgorithm.highlightLine(move.line);
 
-                // Animate move
-                await this.animateMove(move.disk, move.from, move.to);
+                // Animate move (executeMove = true để thực hiện logic di chuyển)
+                await this.animateMove(move.disk, move.from, move.to, true);
 
                 // Đợi một chút trước bước tiếp theo
                 await this.sleep(100);
@@ -311,7 +475,7 @@ class HanoiUI {
 
             // Hoàn thành
             state.isAutoPlaying = false;
-            btn.textContent = 'Tự giải';
+            btn.textContent = 'Auto Solve';
             hanoiAlgorithm.highlightLine(0);
 
             if (hanoiLogic.isCompleted()) {
@@ -348,8 +512,8 @@ class HanoiUI {
         // Highlight code
         hanoiAlgorithm.highlightLine(move.line);
 
-        // Animate
-        await this.animateMove(move.disk, move.from, move.to);
+        // Animate (executeMove = true để thực hiện logic di chuyển)
+        await this.animateMove(move.disk, move.from, move.to, true);
 
         // Kiểm tra hoàn thành
         if (hanoiLogic.isCompleted()) {
