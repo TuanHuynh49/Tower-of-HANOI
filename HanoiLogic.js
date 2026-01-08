@@ -60,6 +60,8 @@ class HanoiLogic {
 
         // Reset algorithm
         hanoiAlgorithm.reset();
+        hanoiAlgorithm.initStacks(numDisks);
+        this.syncToAlgorithm();
     }
 
     /**
@@ -102,6 +104,7 @@ class HanoiLogic {
 
         // Tăng số bước
         this.state.currentSteps++;
+        this.syncToAlgorithm();
 
         return {
             disk: disk,
@@ -180,6 +183,21 @@ class HanoiLogic {
      */
     getStack(rod) {
         return [...this.state.stacks[rod]];  // Return copy
+    }
+
+    /**
+    * Đồng bộ state sang algorithm stack
+    */
+    syncToAlgorithm() {
+        // Copy state.stacks sang algorithm stacks
+        hanoiAlgorithm.stackA.items = [...this.state.stacks.A];
+        hanoiAlgorithm.stackA.top = this.state.stacks.A.length - 1;
+    
+        hanoiAlgorithm.stackB.items = [...this.state.stacks.B];
+        hanoiAlgorithm.stackB.top = this.state.stacks.B.length - 1;
+    
+        hanoiAlgorithm.stackC.items = [...this.state.stacks.C];
+        hanoiAlgorithm.stackC.top = this.state.stacks.C.length - 1;
     }
 }
 

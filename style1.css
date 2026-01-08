@@ -199,7 +199,8 @@ input[type=range] {
 	padding: 0;
 	box-shadow: none;
     margin-right: -80px;   /* chỉnh số âm để sát lề hơn */
-    /* top: 100px; */
+    position: relative;
+    top: -35px;
 }
 
 .team-badge img {
@@ -207,7 +208,6 @@ input[type=range] {
 	height: auto;
 	object-fit: contain;
 	border-radius: 0;  /* không bo tròn */
-
 }
 
 .hover-hint {
@@ -249,21 +249,50 @@ input[type=range] {
     gap: 60px;
 }
 
-/* Thanh hiển thị Stack - Thu nhỏ chiều cao */
+/* Thanh hiển thị Stack - CHỈNH LẠI */
 .stack-view {
     width: 50px;
-    height: 240px; /* Giảm từ 250px xuống 180px */
-    background-color: transparent; /* Trong suốt */
-    border: 2px solid #000000; /* Khung đen */
-    border-top: none; /* Bỏ nắp trên */
+    height: 240px;
+    background-color: transparent;
+    border: 2px solid #000000;
+    border-top: none;
+    display: flex;
+    flex-direction: column-reverse; /* ← Từ dưới lên */
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+    border-radius: 0;
+    gap: 2px; /* ← Khoảng cách giữa các ô */
+}
+
+/* ← THÊM CSS MỚI CHO CÁC Ô VUÔNG */
+.stack-box {
+    width: 40px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
     font-weight: bold;
-    font-size: 0.8rem;
-    padding: 5px;
-    border-radius: 0; /* Bỏ bo tròn = góc vuông */
+    font-size: 1rem;
+    color: #000;
+    border: 2px solid #333;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 300ms ease-out, opacity 300ms ease-out;
+    transform: translateY(0);
+}
+
+/* Label "Top" bên cạnh stack */
+.stack-label {
+    width: 40px;
+    height: 240px;
+    display: flex;
+    align-items: flex-start; /* Căn chữ "Top" ở trên cùng */
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #000;
+    padding-top: 5px;
 }
 
 /* Khu vực chứa Cọc và Đĩa */

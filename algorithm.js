@@ -9,6 +9,7 @@ class Stack {
     constructor(name) {
         this.name = name;  // Tên stack (A, B, C)
         this.items = [];   // Mảng chứa các phần tử
+        this.top = -1;     // ← THÊM: Chỉ số phần tử trên cùng (-1 = rỗng)
     }
 
     /**
@@ -17,6 +18,7 @@ class Stack {
      */
     push(element) {
         this.items.push(element);
+        this.top++;  // ← THÊM: Tăng top
     }
 
     /**
@@ -29,6 +31,7 @@ class Stack {
             return null;
         }
         const element = this.items.pop();
+        this.top--;  // ← THÊM: Giảm top
         console.log(`Stack ${this.name}: POP() → ${element}, còn lại [${this.items.join(', ')}]`);
         return element;
     }
@@ -41,7 +44,7 @@ class Stack {
         if (this.isEmpty()) {
             return null;
         }
-        return this.items[this.items.length - 1];
+        return this.items[this.top];  // ← SỬA: Dùng this.top thay vì length-1
     }
 
     /**
@@ -49,7 +52,7 @@ class Stack {
      * @returns {boolean}
      */
     isEmpty() {
-        return this.items.length === 0;
+        return this.top === -1;  // ← SỬA: Dùng top thay vì length
     }
 
     /**
@@ -57,7 +60,7 @@ class Stack {
      * @returns {number}
      */
     size() {
-        return this.items.length;
+        return this.top + 1;  // ← SỬA: Dùng top + 1
     }
 
     /**
@@ -65,7 +68,16 @@ class Stack {
      */
     clear() {
         this.items = [];
+        this.top = -1;  // ← THÊM: Reset top về -1
         console.log(`Stack ${this.name}: CLEAR() → Stack đã được xóa`);
+    }
+
+    /**
+     * Lấy giá trị top (chỉ số phần tử trên cùng)
+     * @returns {number} - Trả về -1 nếu stack rỗng
+     */
+    getTop() {
+        return this.top;
     }
 
     /**
@@ -73,7 +85,7 @@ class Stack {
      * @returns {string}
      */
     toString() {
-        return `Stack ${this.name}: [${this.items.join(', ')}]`;
+        return `Stack ${this.name}: [${this.items.join(', ')}], Top: ${this.top}`;
     }
 
     /**

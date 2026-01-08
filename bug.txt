@@ -1,0 +1,4 @@
+lỗi animation disk
+tốc dộ của stack chưa tương thích vs speed
+chưa kiểm display code
+chưa làm animation logo khi nhấp vào + thông tin nhóm

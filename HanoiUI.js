@@ -274,6 +274,7 @@ class HanoiUI {
 
         // Update stack view
         this.updateStackViews();
+        this.updateTopValues();
     }
 
     /**
@@ -354,7 +355,7 @@ class HanoiUI {
 
             // Tính toán vị trí đích
             const toRect = toContainer.getBoundingClientRect();
-            const liftY = stageRect.top + 50; // Nhấc lên cao
+            const liftY = stageRect.top + 50; // Nhấc lên cao///////////////////////////
 
             // Animation 3 giai đoạn
             setTimeout(() => {
@@ -394,21 +395,103 @@ class HanoiUI {
     }
 
     /**
-     * Update hiển thị stack
+     * Update hiển thị stack với animation
      */
     updateStackViews() {
         ['A', 'B', 'C'].forEach(rod => {
             const stack = hanoiLogic.getStack(rod);
             const stackView = document.getElementById(`stack-view-${rod}`);
             
-            if (stack.length === 0) {
-                stackView.innerHTML = `<small>Rỗng</small>`;
+            // Lưu trạng thái cũ để so sánh
+            const oldBoxes = Array.from(stackView.querySelectorAll('.stack-box'));
+            const oldValues = oldBoxes.map(box => parseInt(box.textContent));
+            
+            // So sánh để phát hiện thay đổi
+            const isAdded = stack.length > oldValues.length;
+            const isRemoved = stack.length < oldValues.length;
+            
+            // Tính khoảng cách đến đỉnh stack (chiều cao stack = 240px)
+            const stackHeight = 240;
+            const boxHeight = 22; // 20px + 2px gap
+            const currentHeight = oldBoxes.length * boxHeight;
+            const distanceToTop = stackHeight - currentHeight;
+            
+            if (isRemoved && oldBoxes.length > 0) {
+                // Animation POP: Box bay lên đến đỉnh stack rồi mới biến mất
+                const topBox = oldBoxes[oldBoxes.length - 1];
+                topBox.style.transition = 'transform 800ms ease-out, opacity 400ms ease-out 400ms';
+                topBox.style.transform = `translateY(-${distanceToTop}px)`; // Bay đến đỉnh
+                topBox.style.opacity = '0';
+                
+                setTimeout(() => {
+                    this.renderStackView(rod, stack);
+                }, 800);
+            } else if (isAdded) {
+                // Animation PUSH: Box rơi từ đỉnh stack xuống
+                // Render trước KHÔNG có transition
+                this.renderStackView(rod, stack);
+                
+                // Lấy box mới vừa được tạo
+                const newBoxes = stackView.querySelectorAll('.stack-box');
+                const topBox = newBoxes[newBoxes.length - 1];
+                
+                if (topBox) {
+                    // Tính khoảng cách từ đỉnh stack đến vị trí mới
+                    const newHeight = newBoxes.length * boxHeight;
+                    const distanceFromTop = stackHeight - newHeight;
+                    
+                    // Bước 1: Set vị trí ban đầu (ở đỉnh stack, ẩn) KHÔNG có transition
+                    topBox.style.transition = 'none';
+                    topBox.style.transform = `translateY(-${distanceFromTop}px)`;
+                    topBox.style.opacity = '0';
+                    
+                    // Bước 2: Force reflow
+                    topBox.offsetHeight;
+                    
+                    // Bước 3: Bật transition và rơi xuống + hiện dần
+                    requestAnimationFrame(() => {
+                        topBox.style.transition = 'transform 600ms ease-in, opacity 300ms ease-in';
+                        topBox.style.transform = 'translateY(0)';
+                        topBox.style.opacity = '1';
+                    });
+                }
             } else {
-                stackView.innerHTML = `<small>Top: ${stack[stack.length - 1]}</small><br>` +
-                                     `<small>[${stack.join(', ')}]</small>`;
+                // Không có thay đổi hoặc reset hoàn toàn
+                this.renderStackView(rod, stack);
             }
         });
     }
+
+    /**
+     * Helper: Render stack view không animation
+     */
+    renderStackView(rod, stack) {
+        const stackView = document.getElementById(`stack-view-${rod}`);
+        stackView.innerHTML = '';
+        
+        if (stack.length === 0) {
+            stackView.innerHTML = `<small style="color: #999;">Empty</small>`;
+        } else {
+            stack.forEach(diskNumber => {
+                const box = document.createElement('div');
+                box.className = 'stack-box';
+                box.textContent = diskNumber;
+                box.style.backgroundColor = this.diskColors[diskNumber - 1];
+                stackView.appendChild(box);
+            });
+        }
+    }
+
+    // Lấy giá trị top từ algorithm (chỉ số phần tử trên cùng)
+    updateTopValues() {
+    const topA = hanoiAlgorithm.stackA.getTop();
+    const topB = hanoiAlgorithm.stackB.getTop();
+    const topC = hanoiAlgorithm.stackC.getTop();
+
+    document.getElementById('top-value-A').textContent = topA;
+    document.getElementById('top-value-B').textContent = topB;
+    document.getElementById('top-value-C').textContent = topC;
+}
 
     /**
      * Update thống kê
@@ -417,6 +500,7 @@ class HanoiUI {
         const state = hanoiLogic.getState();
         document.getElementById('min-steps-display').textContent = state.minSteps;
         document.getElementById('current-steps-display').textContent = state.currentSteps;
+        this.updateTopValues();
     }
 
     /**
@@ -436,6 +520,7 @@ class HanoiUI {
         
         // Đổi text nút về ban đầu
         document.getElementById('btn-instant').textContent = 'Auto Solve';
+        this.updateTopValues();
     }
 
     /**
