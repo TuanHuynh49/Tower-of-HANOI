@@ -1,4 +1,4 @@
-lỗi animation disk
-tốc dộ của stack chưa tương thích vs speed
 chưa kiểm display code
-chưa làm animation logo khi nhấp vào + thông tin nhóm
+Vũ-chưa tối giản code (nếu có code dư + yêu cầu ko thay đổi chức năng và logic code)
+Vũ-chưa chỉnh cmt trong code lại cho ít nhưng vẫn cụ thể
+chưa trang trí...

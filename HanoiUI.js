@@ -87,6 +87,23 @@ class HanoiUI {
         document.getElementById('btn-next').addEventListener('click', () => {
             this.nextMove();
         });
+
+        // Click vào logo để hiện modal
+        document.getElementById('team-logo').addEventListener('click', () => {
+            document.getElementById('team-modal').style.display = 'block';
+        });
+
+        // Click vào nút X để đóng modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('team-modal').style.display = 'none';
+        });
+
+        // Click vào nền tối để đóng modal
+        document.getElementById('team-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'team-modal') {
+                document.getElementById('team-modal').style.display = 'none';
+            }
+        });    
     }
 
     /**
@@ -94,6 +111,8 @@ class HanoiUI {
      */
     toggleManualMode() {
         const btn = document.getElementById('btn-auto');
+        const btnNext = document.getElementById('btn-next');
+        const btnAutoSolve = document.getElementById('btn-instant');
         
         if (this.manualMode) {
             // Tắt chế độ thủ công
@@ -102,6 +121,15 @@ class HanoiUI {
             this.selectedRod = null;
             btn.textContent = 'Manual Play';
             btn.style.backgroundColor = '#ffd000';
+
+            // Bật lại nút Next move và Auto Solve
+            btnNext.disabled = false;
+            btnNext.style.opacity = '1';
+            btnNext.style.cursor = 'pointer';
+        
+            btnAutoSolve.disabled = false;
+            btnAutoSolve.style.opacity = '1';
+            btnAutoSolve.style.cursor = 'pointer';
             
             // Xóa event listeners
             this.removeManualEventListeners();
@@ -113,6 +141,15 @@ class HanoiUI {
             this.manualMode = true;
             btn.textContent = 'Exit Manual';
             btn.style.backgroundColor = '#ff6600';
+
+            // Vô hiệu hóa nút Next move và Auto Solve
+            btnNext.disabled = true;
+            btnNext.style.opacity = '0.5';
+            btnNext.style.cursor = 'not-allowed';
+        
+            btnAutoSolve.disabled = true;
+            btnAutoSolve.style.opacity = '0.5';
+            btnAutoSolve.style.cursor = 'not-allowed';
             
             // Thêm event listeners cho đĩa và cọc
             this.setupManualEventListeners();
@@ -314,153 +351,166 @@ class HanoiUI {
         return disk;
     }
 
-    /**
-     * Animation di chuyển đĩa
-     * @param {number} diskNumber - Số đĩa
-     * @param {string} from - Cọc nguồn
-     * @param {string} to - Cọc đích
-     * @param {boolean} executeMove - Có thực hiện logic di chuyển không (default: true)
-     * @returns {Promise}
-     */
-    async animateMove(diskNumber, from, to, executeMove = true) {
-        return new Promise((resolve) => {
-            const speed = hanoiLogic.getAnimationSpeed();
-            const fromContainer = document.getElementById(`rod-${from}-disks`);
-            const toContainer = document.getElementById(`rod-${to}-disks`);
+	/**
+	 * Animation di chuyển đĩa
+	 * @param {number} diskNumber - Số đĩa
+	 * @param {string} from - Cọc nguồn
+	 * @param {string} to - Cọc đích
+	 * @param {boolean} executeMove - Có thực hiện logic di chuyển không (default: true)
+	 * @returns {Promise}
+	 */
+	async animateMove(diskNumber, from, to, executeMove = true) {
+		return new Promise((resolve) => {
+			const speed = hanoiLogic.getAnimationSpeed();
+			const fromContainer = document.getElementById(`rod-${from}-disks`);
+			const toContainer = document.getElementById(`rod-${to}-disks`);
 
-            // Tìm đĩa cần di chuyển
-            const disk = fromContainer.querySelector(`[data-disk="${diskNumber}"]`);
-            if (!disk) {
-                console.error(`Không tìm thấy đĩa ${diskNumber} trên cọc ${from}`);
-                resolve();
-                return;
-            }
+			// Tìm đĩa cần di chuyển
+			const disk = fromContainer.querySelector(`[data-disk="${diskNumber}"]`);
+			if (!disk) {
+				console.error(`Không tìm thấy đĩa ${diskNumber} trên cọc ${from}`);
+				resolve();
+				return;
+			}
 
-            // Lấy vị trí ban đầu
-            const startRect = disk.getBoundingClientRect();
-            const stageRect = document.querySelector('.game-stage').getBoundingClientRect();
+			// Lấy vị trí ban đầu
+			const startRect = disk.getBoundingClientRect();
+			const stageRect = document.querySelector('.game-stage').getBoundingClientRect();
 
-            // Tạo disk clone để animate
-            const cloneDisk = disk.cloneNode(true);
-            cloneDisk.style.position = 'fixed';
-            cloneDisk.style.left = `${startRect.left}px`;
-            cloneDisk.style.top = `${startRect.top}px`;
-            cloneDisk.style.width = `${startRect.width}px`;
-            cloneDisk.style.zIndex = '1000';
-            cloneDisk.style.transition = `all ${speed}ms ease-in-out`;
-            document.body.appendChild(cloneDisk);
+			// Tạo disk clone để animate
+			const cloneDisk = disk.cloneNode(true);
+			cloneDisk.style.position = 'fixed';
+			cloneDisk.style.left = `${startRect.left}px`;
+			cloneDisk.style.top = `${startRect.top}px`;
+			cloneDisk.style.width = `${startRect.width}px`;
+			cloneDisk.style.zIndex = '1000';
+			document.body.appendChild(cloneDisk);
 
-            // Ẩn disk gốc
-            disk.style.opacity = '0';
+			// Ẩn disk gốc
+			disk.style.opacity = '0';
 
-            // Tính toán vị trí đích
-            const toRect = toContainer.getBoundingClientRect();
-            const liftY = stageRect.top + 50; // Nhấc lên cao///////////////////////////
+			// Tính toán vị trí đích
+			const toRect = toContainer.getBoundingClientRect();
 
-            // Animation 3 giai đoạn
-            setTimeout(() => {
-                // Giai đoạn 1: Nhấc lên
-                cloneDisk.style.top = `${liftY}px`;
-            }, 50);
+			// Chiều cao để nhấc lên (cao hơn cột pole)
+			const poleTop = stageRect.top + 20; // Cao hơn đỉnh pole một chút
 
-            setTimeout(() => {
-                // Giai đoạn 2: Di chuyển ngang
-                cloneDisk.style.left = `${toRect.left + (toRect.width - startRect.width) / 2}px`;
-            }, speed / 3);
+			// Tính vị trí X đích (căn giữa cọc đích)
+			const finalX = toRect.left + (toRect.width - startRect.width) / 2;
 
-            setTimeout(() => {
-                // Giai đoạn 3: Hạ xuống
-                const numDisksBelow = toContainer.children.length;
-                const finalY = toRect.bottom - (numDisksBelow + 1) * this.diskHeight;
-                cloneDisk.style.top = `${finalY}px`;
-            }, speed * 2 / 3);
+			// Tính vị trí Y đích (vị trí chính xác trên cọc đích)
+			const numDisksBelow = toContainer.children.length;
+			const finalY = toRect.bottom - (numDisksBelow + 1) * this.diskHeight;
 
-            // Hoàn thành animation
-            setTimeout(() => {
-                // Xóa clone
-                cloneDisk.remove();
-                
-                // Thực hiện logic di chuyển nếu cần
-                if (executeMove) {
-                    hanoiLogic.makeMove(from, to);
-                }
-                
-                // Render lại
-                this.renderGame();
-                this.updateStats();
-                
-                resolve();
-            }, speed);
-        });
-    }
+			// GIAI ĐOẠN 1: Nhấc thẳng lên
+			cloneDisk.style.transition = `top ${speed / 3}ms ease-out`;
+			setTimeout(() => {
+				cloneDisk.style.top = `${poleTop}px`;
+			}, 50);
 
-    /**
-     * Update hiển thị stack với animation
-     */
-    updateStackViews() {
-        ['A', 'B', 'C'].forEach(rod => {
-            const stack = hanoiLogic.getStack(rod);
-            const stackView = document.getElementById(`stack-view-${rod}`);
-            
-            // Lưu trạng thái cũ để so sánh
-            const oldBoxes = Array.from(stackView.querySelectorAll('.stack-box'));
-            const oldValues = oldBoxes.map(box => parseInt(box.textContent));
-            
-            // So sánh để phát hiện thay đổi
-            const isAdded = stack.length > oldValues.length;
-            const isRemoved = stack.length < oldValues.length;
-            
-            // Tính khoảng cách đến đỉnh stack (chiều cao stack = 240px)
-            const stackHeight = 240;
-            const boxHeight = 22; // 20px + 2px gap
-            const currentHeight = oldBoxes.length * boxHeight;
-            const distanceToTop = stackHeight - currentHeight;
-            
-            if (isRemoved && oldBoxes.length > 0) {
-                // Animation POP: Box bay lên đến đỉnh stack rồi mới biến mất
-                const topBox = oldBoxes[oldBoxes.length - 1];
-                topBox.style.transition = 'transform 800ms ease-out, opacity 400ms ease-out 400ms';
-                topBox.style.transform = `translateY(-${distanceToTop}px)`; // Bay đến đỉnh
-                topBox.style.opacity = '0';
-                
-                setTimeout(() => {
-                    this.renderStackView(rod, stack);
-                }, 800);
-            } else if (isAdded) {
-                // Animation PUSH: Box rơi từ đỉnh stack xuống
-                // Render trước KHÔNG có transition
-                this.renderStackView(rod, stack);
-                
-                // Lấy box mới vừa được tạo
-                const newBoxes = stackView.querySelectorAll('.stack-box');
-                const topBox = newBoxes[newBoxes.length - 1];
-                
-                if (topBox) {
-                    // Tính khoảng cách từ đỉnh stack đến vị trí mới
-                    const newHeight = newBoxes.length * boxHeight;
-                    const distanceFromTop = stackHeight - newHeight;
-                    
-                    // Bước 1: Set vị trí ban đầu (ở đỉnh stack, ẩn) KHÔNG có transition
-                    topBox.style.transition = 'none';
-                    topBox.style.transform = `translateY(-${distanceFromTop}px)`;
-                    topBox.style.opacity = '0';
-                    
-                    // Bước 2: Force reflow
-                    topBox.offsetHeight;
-                    
-                    // Bước 3: Bật transition và rơi xuống + hiện dần
-                    requestAnimationFrame(() => {
-                        topBox.style.transition = 'transform 600ms ease-in, opacity 300ms ease-in';
-                        topBox.style.transform = 'translateY(0)';
-                        topBox.style.opacity = '1';
-                    });
-                }
-            } else {
-                // Không có thay đổi hoặc reset hoàn toàn
-                this.renderStackView(rod, stack);
-            }
-        });
-    }
+			// GIAI ĐOẠN 2: Di chuyển ngang
+			setTimeout(() => {
+				cloneDisk.style.transition = `left ${speed / 3}ms linear`;
+				cloneDisk.style.left = `${finalX}px`;
+			}, speed / 3 + 100);
+
+			// GIAI ĐOẠN 3: Hạ thẳng xuống
+			setTimeout(() => {
+				cloneDisk.style.transition = `top ${speed / 3}ms ease-in`;
+				cloneDisk.style.top = `${finalY}px`;
+			}, (speed * 2) / 3 + 150);
+
+			// Hoàn thành animation
+			setTimeout(() => {
+				// Xóa clone
+				cloneDisk.remove();
+
+				// Thực hiện logic di chuyển nếu cần
+				if (executeMove) {
+					hanoiLogic.makeMove(from, to);
+				}
+
+				// Render lại
+				this.renderGame();
+				this.updateStats();
+
+				resolve();
+			}, speed + 200);
+		});
+	}
+
+	/**
+	 * Update hiển thị stack với animation
+	 */
+	updateStackViews() {
+		['A', 'B', 'C'].forEach(rod => {
+			const stack = hanoiLogic.getStack(rod);
+			const stackView = document.getElementById(`stack-view-${rod}`);
+			
+			// Lấy tốc độ animation hiện tại
+			const speed = hanoiLogic.getAnimationSpeed();
+			const popDuration = speed / 3;  // Thời gian bay lên
+			const pushDuration = speed / 3; // Thời gian rơi xuống
+			
+			// Lưu trạng thái cũ để so sánh
+			const oldBoxes = Array.from(stackView.querySelectorAll('.stack-box'));
+			const oldValues = oldBoxes.map(box => parseInt(box.textContent));
+			
+			// So sánh để phát hiện thay đổi
+			const isAdded = stack.length > oldValues.length;
+			const isRemoved = stack.length < oldValues.length;
+			
+			// Tính khoảng cách đến đỉnh stack (chiều cao stack = 240px)
+			const stackHeight = 240;
+			const boxHeight = 22; // 20px + 2px gap
+			const currentHeight = oldBoxes.length * boxHeight;
+			const distanceToTop = stackHeight - currentHeight;
+			
+			if (isRemoved && oldBoxes.length > 0) {
+				// Animation POP: Box bay lên đến đỉnh stack rồi mới biến mất
+				const topBox = oldBoxes[oldBoxes.length - 1];
+				topBox.style.transition = `transform ${popDuration}ms ease-out, opacity ${popDuration / 2}ms ease-out ${popDuration / 2}ms`;
+				topBox.style.transform = `translateY(-${distanceToTop}px)`; // Bay đến đỉnh
+				topBox.style.opacity = '0';
+				
+				setTimeout(() => {
+					this.renderStackView(rod, stack);
+				}, popDuration);
+			} else if (isAdded) {
+				// Animation PUSH: Box rơi từ đỉnh stack xuống
+				// Render trước KHÔNG có transition
+				this.renderStackView(rod, stack);
+				
+				// Lấy box mới vừa được tạo
+				const newBoxes = stackView.querySelectorAll('.stack-box');
+				const topBox = newBoxes[newBoxes.length - 1];
+				
+				if (topBox) {
+					// Tính khoảng cách từ đỉnh stack đến vị trí mới
+					const newHeight = newBoxes.length * boxHeight;
+					const distanceFromTop = stackHeight - newHeight;
+					
+					// Bước 1: Set vị trí ban đầu (ở đỉnh stack, ẩn) KHÔNG có transition
+					topBox.style.transition = 'none';
+					topBox.style.transform = `translateY(-${distanceFromTop}px)`;
+					topBox.style.opacity = '0';
+					
+					// Bước 2: Force reflow
+					topBox.offsetHeight;
+					
+					// Bước 3: Bật transition và rơi xuống + hiện dần
+					requestAnimationFrame(() => {
+						topBox.style.transition = `transform ${pushDuration}ms ease-in, opacity ${pushDuration / 2}ms ease-in`;
+						topBox.style.transform = 'translateY(0)';
+						topBox.style.opacity = '1';
+					});
+				}
+			} else {
+				// Không có thay đổi hoặc reset hoàn toàn
+				this.renderStackView(rod, stack);
+			}
+		});
+	}
 
     /**
      * Helper: Render stack view không animation
