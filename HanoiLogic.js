@@ -1,43 +1,31 @@
-/* =========================================================
-   HANOILOGIC.JS - Logic xử lý trạng thái game
-   ========================================================= */
+// Logic xử lý trạng thái game
 
-/**
- * Class quản lý logic và trạng thái của game Tháp Hà Nội
- */
 class HanoiLogic {
     constructor() {
-        // Cấu hình tốc độ animation
+        // Cấu hình tốc độ animation (ms)
         this.speeds = {
-            1: 2000,   // Slow
-            2: 1500,
-            3: 1000,   // Medium (mặc định)
-            4: 600,
-            5: 300     // Fast
+            1: 2000,   // Very Slow
+            2: 1500,   // Slow
+            3: 1000,   // Medium
+            4: 600,    // Fast
+            5: 300     // Very Fast
         };
 
         // Trạng thái game
         this.state = {
-            stacks: {
-                A: [],
-                B: [],
-                C: []
-            },
-            currentSteps: 0,
-            minSteps: 0,
-            numDisks: 5,
-            animationSpeed: 3,
+            stacks: { A: [], B: [], C: [] },  // 3 cọc chứa đĩa
+            currentSteps: 0,                   // Số bước đã thực hiện
+            minSteps: 0,                       // Số bước tối thiểu
+            numDisks: 5,                       // Số lượng đĩa
+            animationSpeed: 3,                 // Tốc độ (1-5)
             isAnimating: false,
             isAutoPlaying: false,
-            moves: [],
+            moves: [],                         // Danh sách các bước
             currentMoveIndex: 0
         };
     }
 
-    /**
-     * Khởi tạo game với số đĩa
-     * @param {number} numDisks - Số lượng đĩa
-     */
+    // Khởi tạo game với số đĩa
     initGame(numDisks) {
         this.state.numDisks = numDisks;
         this.state.minSteps = hanoiAlgorithm.calculateMinSteps(numDisks);
@@ -46,50 +34,40 @@ class HanoiLogic {
         this.state.moves = [];
         this.state.isAutoPlaying = false;
 
-        // Reset stacks - Đĩa lớn nhất (số lớn) ở dưới cùng
-        this.state.stacks = {
-            A: [],
-            B: [],
-            C: []
-        };
+        // Reset stacks
+        this.state.stacks = { A: [], B: [], C: [] };
 
-        // Thêm đĩa từ lớn đến nhỏ (10, 9, 8, ... 1)
+        // Thêm đĩa vào cọc A (từ lớn đến nhỏ)
         for (let i = numDisks; i >= 1; i--) {
             this.state.stacks.A.push(i);
         }
 
-        // Reset algorithm
+        // Đồng bộ với algorithm
         hanoiAlgorithm.reset();
         hanoiAlgorithm.initStacks(numDisks);
         this.syncToAlgorithm();
     }
 
-    /**
-     * Tạo danh sách moves để giải
-     */
+    // Tạo danh sách các bước để giải
     generateMoves() {
         const n = this.state.numDisks;
         this.state.moves = hanoiAlgorithm.solveHanoi(n, 'A', 'C', 'B');
         this.state.currentMoveIndex = 0;
     }
 
-    /**
-     * Thực hiện một bước di chuyển
-     * @param {string} from - Cọc nguồn
-     * @param {string} to - Cọc đích
-     * @returns {Object|null} - Thông tin di chuyển hoặc null nếu không hợp lệ
-     */
+    /*
+    Thực hiện một bước di chuyển (Manual mode)
+    Kiểm tra tính hợp lệ trước khi di chuyển
+    */
     makeMove(from, to) {
         const fromStack = this.state.stacks[from];
         const toStack = this.state.stacks[to];
 
-        // Kiểm tra có đĩa để di chuyển không
         if (fromStack.length === 0) {
             console.log(`Không có đĩa trên cọc ${from}`);
             return null;
         }
 
-        // Lấy đĩa trên cùng
         const disk = fromStack[fromStack.length - 1];
 
         // Kiểm tra quy tắc: không được đặt đĩa lớn lên đĩa nhỏ
@@ -101,95 +79,56 @@ class HanoiLogic {
         // Di chuyển đĩa
         fromStack.pop();
         toStack.push(disk);
-
-        // Tăng số bước
         this.state.currentSteps++;
         this.syncToAlgorithm();
 
-        return {
-            disk: disk,
-            from: from,
-            to: to
-        };
+        return { disk, from, to };
     }
 
-    /**
-     * Lấy bước di chuyển tiếp theo
-     * @returns {Object|null} - Bước di chuyển hoặc null nếu hết
-     */
     getNextMove() {
         if (this.state.currentMoveIndex >= this.state.moves.length) {
             return null;
         }
-
         const move = this.state.moves[this.state.currentMoveIndex];
         this.state.currentMoveIndex++;
         return move;
     }
 
-    /**
-     * Kiểm tra đã hoàn thành chưa
-     * @returns {boolean}
-     */
+    // Kiểm tra đã hoàn thành chưa (tất cả đĩa ở cọc C)
     isCompleted() {
         return this.state.stacks.C.length === this.state.numDisks;
     }
 
-    /**
-     * Lấy tốc độ animation hiện tại (ms)
-     * @returns {number}
-     */
     getAnimationSpeed() {
         return this.speeds[this.state.animationSpeed];
     }
 
-    /**
-     * Đặt tốc độ animation
-     * @param {number} speed - Giá trị từ 1-5
-     */
     setAnimationSpeed(speed) {
         if (speed >= 1 && speed <= 5) {
             this.state.animationSpeed = speed;
         }
     }
 
-    /**
-     * Lấy text mô tả tốc độ
-     * @returns {string}
-     */
     getSpeedText() {
         const speedTexts = {
-            1: 'Very Slow',
-            2: 'Slow',
-            3: 'Medium',
-            4: 'Fast',
-            5: 'Very Fast'
+            1: 'Very Slow', 2: 'Slow', 3: 'Medium', 4: 'Fast', 5: 'Very Fast'
         };
         return speedTexts[this.state.animationSpeed] || 'Medium';
     }
 
-    /**
-     * Lấy trạng thái hiện tại
-     * @returns {Object}
-     */
     getState() {
         return this.state;
     }
 
-    /**
-     * Lấy stack hiện tại của một cọc
-     * @param {string} rod - Tên cọc (A, B, C)
-     * @returns {Array}
-     */
     getStack(rod) {
-        return [...this.state.stacks[rod]];  // Return copy
+        return [...this.state.stacks[rod]];
     }
 
-    /**
-    * Đồng bộ state sang algorithm stack
+    /*
+    Đồng bộ state từ game logic sang algorithm stack
+    Cập nhật cả items và top index
     */
     syncToAlgorithm() {
-        // Copy state.stacks sang algorithm stacks
         hanoiAlgorithm.stackA.items = [...this.state.stacks.A];
         hanoiAlgorithm.stackA.top = this.state.stacks.A.length - 1;
     
@@ -201,5 +140,4 @@ class HanoiLogic {
     }
 }
 
-// Export instance
 const hanoiLogic = new HanoiLogic();

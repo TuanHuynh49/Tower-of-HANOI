@@ -8,79 +8,64 @@
 </head>
 
 <body>
+    <!-- Video nền -->
     <video class="app-bg-video" autoplay muted loop>
-			<source src="nen.mp4" type="video/mp4">
-	</video>
-    <!-- =================== APP CONTAINER ===================
-         Bao toàn bộ ứng dụng Tháp Hà Nội
-    ======================================================== -->
-    <div class="app-container">
+        <source src="nen.mp4" type="video/mp4">
+    </video>
 
-        <!-- =================== TOP BAR ===================
-             KHU VỰC 1: Thống kê + Điều khiển chung
-             - Số bước
-             - Chọn số đĩa
-             - Chọn tốc độ
-             - Thông tin nhóm
-        ==================================================== -->
+    <div class="app-container">
+        
+        <!-- HEADER: Thống kê + Điều khiển + Info -->
         <header class="top-bar">
             
-            <!-- ===== Thống kê số bước ===== -->
+            <!-- Thống kê số bước -->
             <div class="stats-section">
-                <!-- Số bước tối thiểu (2^n - 1) -->
                 <div class="stat-box">
                     <label>Minimum Moves</label>
                     <div class="circle circle-min" id="min-steps-display">0</div>
                 </div>
-                
-                <!-- Số bước hiện tại đã thực hiện -->
                 <div class="stat-box">
                     <label>Current Move Count</label>
                     <div class="circle circle-current" id="current-steps-display">0</div>
                 </div>
             </div>
 
-            <!-- ===== Điều khiển cấu hình ===== -->
-			<div class="controls-section">
-				<h1>Tower of Hanoi</h1>
+            <!-- Điều khiển cấu hình -->
+            <div class="controls-section">
+                <h1>Tower of Hanoi</h1>
+                <div class="controls-row">
+                    
+                    <!-- Chọn số đĩa -->
+                    <div class="input-wrapper">
+                        <div class="label-group">
+                            <label for="disk-range">
+                                Number of disks: <span id="disk-count-value">5</span>
+                            </label>
+                        </div>
+                        <div class="range-minmax">
+                            <span>3</span>
+                            <span>10</span>
+                        </div>
+                        <input type="range" id="disk-range" min="3" max="10" value="5">
+                    </div>
 
-				<div class="controls-row">
-					<!-- Chọn số lượng đĩa -->
-					<div class="input-wrapper">
-						<div class="label-group">
-							<label for="disk-range">
-								Number of disks: <span id="disk-count-value">5</span>
-							</label>
-						</div>
+                    <!-- Chọn tốc độ -->
+                    <div class="input-wrapper">
+                        <div class="label-group">
+                            <label for="speed-range">
+                                Speed: <span id="speed-text">Medium</span>
+                            </label>
+                        </div>
+                        <div class="range-minmax">
+                            <span>Very Slow</span>
+                            <span>Very Fast</span>
+                        </div>
+                        <input type="range" id="speed-range" min="1" max="5" value="3">
+                    </div>
+                </div>
+            </div>
 
-						<div class="range-minmax">
-							<span>3</span>
-							<span>10</span>
-						</div>
-
-						<input type="range" id="disk-range" min="3" max="10" value="5">
-					</div>
-
-					<!-- Chọn tốc độ animation -->
-					<div class="input-wrapper">
-						<div class="label-group">
-							<label for="speed-range">
-								Speed: <span id="speed-text">Medium</span>
-							</label>
-						</div>
-
-						<div class="range-minmax">
-							<span>Very Slow</span>
-							<span>Very Fast</span>
-						</div>
-
-						<input type="range" id="speed-range" min="1" max="5" value="3">
-					</div>
-				</div>
-			</div>
-
-
-            <!-- ===== Thông tin nhóm ===== -->
+            <!-- Logo nhóm -->
             <div class="info-section">
                 <div class="team-badge" id="team-logo">
                     <img src="logo.png" alt="Logo nhóm">
@@ -88,109 +73,61 @@
             </div>
 
             <!-- Modal thông tin nhóm -->
-			<div class="team-modal" id="team-modal">
-				<div class="modal-content">
-					<span class="close-btn" id="close-modal">&times;</span>
-					<h2>Thông tin nhóm</h2>
-					<div class="team-info">
-						<p><span class="name">Huỳnh Lê Anh Tuấn</span> - 24110143</p>
-						<p><span class="name">Ngô Quang Trường</span> - 24110142</p>
+            <div class="team-modal" id="team-modal">
+                <div class="modal-content">
+                    <span class="close-btn" id="close-modal">&times;</span>
+                    <h2>Thông tin nhóm</h2>
+                    <div class="team-info">
+                        <p><span class="name">Huỳnh Lê Anh Tuấn</span> - 24110143</p>
+                        <p><span class="name">Ngô Quang Trường</span> - 24110142</p>
                         <p><span class="name">Phan Anh Vũ</span> - 24110143</p>
-					</div>
-				</div>
-			</div>
-        </header>
-        
-        <!-- =================== MAIN STAGE ===================
-             KHU VỰC 2: SÂN KHẤU MÔ PHỎNG
-             - 3 cọc A, B, C
-             - Đĩa di chuyển
-             - Hiển thị stack thực tế dưới mỗi cọc
-        ==================================================== -->
-        <main class="game-stage">
-
-            <!-- ===== CỌC A (Source) ===== -->
-            <div class="tower-container" id="tower-A">
-
-                <!-- Thêm label Top -->
-                <div class="stack-label">
-                    Top: <span id="top-value-A">-1</span>
-                </div>
-                
-                <!-- Hiển thị Stack A (DSA) -->
-                <div class="stack-view" id="stack-view-A">
-                    Hiển thị<br>stack
-                </div>
-
-                <!-- Cọc + đĩa -->
-                <div class="rod-area">
-                    <div class="pole"></div>
-                    <div class="base"></div>
-
-                    <!-- Nhóm đĩa trên cọc A -->
-                    <div class="disk-group" id="rod-A-disks">
-                        <div class="disk" style="width: 220px; background-color: #ff0000;">10</div>
-                        <div class="disk" style="width: 200px; background-color: #ff6a00;">9</div>
-                        <div class="disk" style="width: 180px; background-color: #fff200;">8</div>
-                        <div class="disk" style="width: 160px; background-color: #83fe00;">7</div>
-                        <div class="disk" style="width: 140px;  background-color: #00ff66;">6</div>
-                        <div class="disk" style="width: 120px; background-color: #00f7ff;">5</div>
-                        <div class="disk" style="width: 100px; background-color: #053fff;">4</div>
-                        <div class="disk" style="width: 80px;  background-color: #a200ff;">3</div>
-                        <div class="disk" style="width: 60px; background-color: #ff00e6;">2</div>
-                        <div class="disk" style="width: 40px;  background-color: #ececec;">1</div>
                     </div>
                 </div>
             </div>
+        </header>
+        
+        <!-- MAIN: Sân khấu mô phỏng 3 cọc -->
+        <main class="game-stage">
 
-            <!-- ===== CỌC B (Auxiliary) ===== -->
-            <div class="tower-container" id="tower-B">
-                <div class="stack-label">
-                    Top: <span id="top-value-B">-1</span>
-                </div>
-
-                <div class="stack-view" id="stack-view-B">
-                    Hiển thị<br>stack
-                </div>
+            <!-- Cọc A -->
+            <div class="tower-container" id="tower-A">
+                <div class="stack-label">Top: <span id="top-value-A">-1</span></div>
+                <div class="stack-view" id="stack-view-A">Hiển thị<br>stack</div>
                 <div class="rod-area">
                     <div class="pole"></div>
                     <div class="base"></div>
+                    <div class="disk-group" id="rod-A-disks"></div>
+                </div>
+            </div>
 
-                    <!-- Nhóm đĩa trên cọc B -->
+            <!-- Cọc B -->
+            <div class="tower-container" id="tower-B">
+                <div class="stack-label">Top: <span id="top-value-B">-1</span></div>
+                <div class="stack-view" id="stack-view-B">Hiển thị<br>stack</div>
+                <div class="rod-area">
+                    <div class="pole"></div>
+                    <div class="base"></div>
                     <div class="disk-group" id="rod-B-disks"></div>
                 </div>
             </div>
 
-            <!-- ===== CỌC C (Destination) ===== -->
+            <!-- Cọc C -->
             <div class="tower-container" id="tower-C">
-                <div class="stack-label">
-                    Top: <span id="top-value-C">-1</span>
-                </div>
-                
-                <div class="stack-view" id="stack-view-C">
-                    Hiển thị<br>stack
-                </div>
+                <div class="stack-label">Top: <span id="top-value-C">-1</span></div>
+                <div class="stack-view" id="stack-view-C">Hiển thị<br>stack</div>
                 <div class="rod-area">
                     <div class="pole"></div>
                     <div class="base"></div>
-
-                    <!-- Nhóm đĩa trên cọc C -->
                     <div class="disk-group" id="rod-C-disks"></div>
                 </div>
             </div>
 
         </main>
 
-
-        <!-- =================== BOTTOM BAR ===================
-             KHU VỰC 3: BỘ NÃO THUẬT TOÁN (DSA ENGINE)
-             - Nút điều khiển thuật toán
-             - Pseudocode
-             - Log & trạng thái
-        ==================================================== -->
+        <!-- FOOTER: Nút điều khiển + Code display -->
         <footer class="bottom-bar">
 
-            <!-- ===== Panel nút điều khiển ===== -->
+            <!-- Nút điều khiển -->
             <div class="buttons-panel">
                 <div class="btn-row">
                     <button class="btn btn-action" id="btn-instant">Auto Solve</button>
@@ -202,11 +139,9 @@
                 </div>
             </div>
 
-            <!-- ===== Panel hiển thị thuật toán ===== -->
+            <!-- Code panel -->
             <div class="code-panel">
                 <h3>Code & Logic Display</h3>
-                
-                <!-- Pseudocode Tháp Hà Nội (highlight theo bước) -->
                 <div class="code-content" id="algorithm-display">
                     <p id="line-1">function Hanoi(n, A, C, B) {</p>
                     <p id="line-2">&nbsp;&nbsp;if (n == 1) Move(1, A, C);</p>
@@ -217,14 +152,14 @@
                     <p id="line-7">&nbsp;&nbsp;}</p>
                     <p id="line-8">}</p>
                 </div>
-
             </div>
 
         </footer>
 
     </div>
-    <!-- ✅ LINK CÁC FILE JAVASCRIPT Ở ĐÂY -->
-    <script src="algorithm.js"></script>
+
+    <!-- Link JavaScript -->
+    <script src="HanoiAlgorithm.js"></script>
     <script src="HanoiLogic.js"></script>
     <script src="HanoiUI.js"></script>
 

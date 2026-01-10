@@ -1,4 +1,2 @@
 chưa kiểm display code
-Vũ-chưa tối giản code (nếu có code dư + yêu cầu ko thay đổi chức năng và logic code)
-Vũ-chưa chỉnh cmt trong code lại cho ít nhưng vẫn cụ thể
-chưa trang trí...
+lỗi size đĩa bị thay đổi

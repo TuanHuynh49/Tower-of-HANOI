@@ -1,36 +1,16 @@
-/* =========================================================
-   HANOIUI.JS - Giao diện và Animation (với chế độ chơi thủ công)
-   ========================================================= */
+// Giao diện & Animation
 
-/**
- * Class quản lý UI và animation
- */
 class HanoiUI {
     constructor() {
-        // Vị trí X của các cọc (tính từ center của stage)
-        this.rodPositions = {
-            A: -300,   // Cọc A bên trái
-            B: 0,      // Cọc B ở giữa
-            C: 300     // Cọc C bên phải
-        };
-
-        // Màu sắc cho từng đĩa (10 màu)
+        // Màu sắc cho từng đĩa (10 màu gradient)
         this.diskColors = [
-            '#ececec',  // Đĩa 1 (nhỏ nhất)
-            '#ff00e6',  // Đĩa 2
-            '#a200ff',  // Đĩa 3
-            '#053fff',  // Đĩa 4
-            '#00f7ff',  // Đĩa 5
-            '#00ff66',  // Đĩa 6
-            '#83fe00',  // Đĩa 7
-            '#fff200',  // Đĩa 8
-            '#ff6a00',  // Đĩa 9
-            '#ff0000'   // Đĩa 10 (lớn nhất)
+            '#ececec', '#ff00e6', '#a200ff', '#053fff', '#00f7ff',
+            '#00ff66', '#83fe00', '#fff200', '#ff6a00', '#ff0000'
         ];
 
         // Kích thước đĩa
-        this.diskBaseWidth = 20;  // Width tối thiểu cho đĩa nhỏ nhất
-        this.diskWidthIncrement = 20;  // Tăng thêm cho mỗi đĩa
+        this.diskBaseWidth = 20;
+        this.diskWidthIncrement = 20;
         this.diskHeight = 20;
 
         // Chế độ chơi thủ công
@@ -39,18 +19,12 @@ class HanoiUI {
         this.selectedRod = null;
     }
 
-    /**
-     * Khởi tạo UI và event listeners
-     */
     init() {
         this.setupEventListeners();
         this.renderGame();
         this.updateStats();
     }
 
-    /**
-     * Setup các event listeners
-     */
     setupEventListeners() {
         // Thay đổi số đĩa
         document.getElementById('disk-range').addEventListener('input', (e) => {
@@ -73,12 +47,12 @@ class HanoiUI {
             this.resetGame();
         });
 
-        // Nút Máy giải (Auto with animation)
+        // Nút Auto Solve
         document.getElementById('btn-instant').addEventListener('click', () => {
             this.toggleAutoPlay();
         });
 
-        // Nút Tự giải (Manual Play Mode)
+        // Nút Manual Play
         document.getElementById('btn-auto').addEventListener('click', () => {
             this.toggleManualMode();
         });
@@ -88,27 +62,23 @@ class HanoiUI {
             this.nextMove();
         });
 
-        // Click vào logo để hiện modal
+        // Modal thông tin nhóm
         document.getElementById('team-logo').addEventListener('click', () => {
             document.getElementById('team-modal').style.display = 'block';
         });
 
-        // Click vào nút X để đóng modal
         document.getElementById('close-modal').addEventListener('click', () => {
             document.getElementById('team-modal').style.display = 'none';
         });
 
-        // Click vào nền tối để đóng modal
         document.getElementById('team-modal').addEventListener('click', (e) => {
             if (e.target.id === 'team-modal') {
                 document.getElementById('team-modal').style.display = 'none';
             }
-        });    
+        });
     }
 
-    /**
-     * Bật/tắt chế độ chơi thủ công
-     */
+    // Bật/tắt chế độ chơi thủ công
     toggleManualMode() {
         const btn = document.getElementById('btn-auto');
         const btnNext = document.getElementById('btn-next');
@@ -122,7 +92,6 @@ class HanoiUI {
             btn.textContent = 'Manual Play';
             btn.style.backgroundColor = '#ffd000';
 
-            // Bật lại nút Next move và Auto Solve
             btnNext.disabled = false;
             btnNext.style.opacity = '1';
             btnNext.style.cursor = 'pointer';
@@ -131,10 +100,7 @@ class HanoiUI {
             btnAutoSolve.style.opacity = '1';
             btnAutoSolve.style.cursor = 'pointer';
             
-            // Xóa event listeners
             this.removeManualEventListeners();
-            
-            // Xóa highlight
             this.clearDiskHighlights();
         } else {
             // Bật chế độ thủ công
@@ -142,7 +108,6 @@ class HanoiUI {
             btn.textContent = 'Exit Manual';
             btn.style.backgroundColor = '#ff6600';
 
-            // Vô hiệu hóa nút Next move và Auto Solve
             btnNext.disabled = true;
             btnNext.style.opacity = '0.5';
             btnNext.style.cursor = 'not-allowed';
@@ -151,18 +116,13 @@ class HanoiUI {
             btnAutoSolve.style.opacity = '0.5';
             btnAutoSolve.style.cursor = 'not-allowed';
             
-            // Thêm event listeners cho đĩa và cọc
             this.setupManualEventListeners();
             
             alert('🎮 Chế độ chơi thủ công!\n\n1. Click vào đĩa trên cùng của một cọc\n2. Click vào cọc đích để di chuyển');
         }
     }
 
-    /**
-     * Setup event listeners cho chế độ chơi thủ công
-     */
     setupManualEventListeners() {
-        // Event listeners cho các cọc
         ['A', 'B', 'C'].forEach(rod => {
             const rodArea = document.getElementById(`tower-${rod}`);
             
@@ -171,7 +131,6 @@ class HanoiUI {
                 this.handleRodClick(rod);
             });
 
-            // Hover effect
             rodArea.addEventListener('mouseenter', () => {
                 if (!this.manualMode) return;
                 rodArea.style.opacity = '0.8';
@@ -185,9 +144,6 @@ class HanoiUI {
         });
     }
 
-    /**
-     * Xóa event listeners cho chế độ thủ công
-     */
     removeManualEventListeners() {
         ['A', 'B', 'C'].forEach(rod => {
             const rodArea = document.getElementById(`tower-${rod}`);
@@ -196,32 +152,31 @@ class HanoiUI {
         });
     }
 
-    /**
-     * Xử lý click vào cọc
-     */
+    /*
+    Xử lý logic khi click vào cọc trong chế độ Manual
+    Click lần 1: chọn cọc nguồn
+    Click lần 2: chọn cọc đích và thực hiện di chuyển
+    */
     async handleRodClick(rod) {
         const state = hanoiLogic.getState();
         const stack = state.stacks[rod];
 
         if (this.selectedRod === null) {
-            // Chưa chọn cọc nào - Chọn cọc nguồn
+            // Chọn cọc nguồn
             if (stack.length === 0) {
                 alert('⚠️ Cọc này không có đĩa!');
                 return;
             }
 
-            // Chọn cọc nguồn
             this.selectedRod = rod;
             this.selectedDisk = stack[stack.length - 1];
-            
-            // Highlight đĩa được chọn
             this.highlightTopDisk(rod);
             
             console.log(`Đã chọn đĩa ${this.selectedDisk} từ cọc ${rod}`);
         } else {
-            // Đã chọn cọc nguồn - Chọn cọc đích
+            // Chọn cọc đích
             if (rod === this.selectedRod) {
-                // Click lại cọc đang chọn - Hủy chọn
+                // Hủy chọn
                 this.selectedRod = null;
                 this.selectedDisk = null;
                 this.clearDiskHighlights();
@@ -229,7 +184,6 @@ class HanoiUI {
                 return;
             }
 
-            // Thực hiện di chuyển
             const fromRod = this.selectedRod;
             const toRod = rod;
             const disk = this.selectedDisk;
@@ -240,26 +194,18 @@ class HanoiUI {
             const topDisk = toStack.length > 0 ? toStack[toStack.length - 1] : null;
             
             if (topDisk !== null && disk > topDisk) {
-                // Di chuyển không hợp lệ
                 alert('❌ Không thể di chuyển!\n\nKhông được đặt đĩa lớn lên đĩa nhỏ.');
-                
-                // Clear highlights
                 this.clearDiskHighlights();
-                
-                // Reset selection
                 this.selectedRod = null;
                 this.selectedDisk = null;
             } else {
-                // Di chuyển hợp lệ
                 console.log(`✅ Di chuyển đĩa ${disk} từ ${fromRod} sang ${toRod}`);
                 
-                // Clear highlights
                 this.clearDiskHighlights();
                 
-                // Animation (với executeMove = true để thực hiện logic)
+                // Animation và thực hiện di chuyển
                 await this.animateMove(disk, fromRod, toRod, true);
                 
-                // Reset selection
                 this.selectedRod = null;
                 this.selectedDisk = null;
                 
@@ -273,9 +219,6 @@ class HanoiUI {
         }
     }
 
-    /**
-     * Highlight đĩa trên cùng của cọc
-     */
     highlightTopDisk(rod) {
         this.clearDiskHighlights();
         const container = document.getElementById(`rod-${rod}-disks`);
@@ -287,9 +230,6 @@ class HanoiUI {
         }
     }
 
-    /**
-     * Clear tất cả highlight đĩa
-     */
     clearDiskHighlights() {
         const allDisks = document.querySelectorAll('.disk');
         allDisks.forEach(disk => {
@@ -298,43 +238,30 @@ class HanoiUI {
         });
     }
 
-    /**
-     * Render toàn bộ game
-     */
+    // Render toàn bộ game
     renderGame() {
         const state = hanoiLogic.getState();
         
-        // Render từng cọc
         this.renderRod('A', state.stacks.A);
         this.renderRod('B', state.stacks.B);
         this.renderRod('C', state.stacks.C);
 
-        // Update stack view
         this.updateStackViews();
         this.updateTopValues();
     }
 
-    /**
-     * Render một cọc với các đĩa
-     * @param {string} rod - Tên cọc (A, B, C)
-     * @param {Array} stack - Mảng đĩa trên cọc
-     */
+    // Render một cọc với các đĩa
     renderRod(rod, stack) {
         const container = document.getElementById(`rod-${rod}-disks`);
         container.innerHTML = '';
 
-        // Render các đĩa từ dưới lên (disk lớn -> nhỏ)
         stack.forEach(diskNumber => {
             const diskElement = this.createDiskElement(diskNumber);
             container.appendChild(diskElement);
         });
     }
 
-    /**
-     * Tạo element đĩa
-     * @param {number} diskNumber - Số đĩa (1-10)
-     * @returns {HTMLElement}
-     */
+    // Tạo element đĩa
     createDiskElement(diskNumber) {
         const disk = document.createElement('div');
         disk.className = 'disk';
@@ -351,170 +278,147 @@ class HanoiUI {
         return disk;
     }
 
-	/**
-	 * Animation di chuyển đĩa
-	 * @param {number} diskNumber - Số đĩa
-	 * @param {string} from - Cọc nguồn
-	 * @param {string} to - Cọc đích
-	 * @param {boolean} executeMove - Có thực hiện logic di chuyển không (default: true)
-	 * @returns {Promise}
-	 */
-	async animateMove(diskNumber, from, to, executeMove = true) {
-		return new Promise((resolve) => {
-			const speed = hanoiLogic.getAnimationSpeed();
-			const fromContainer = document.getElementById(`rod-${from}-disks`);
-			const toContainer = document.getElementById(`rod-${to}-disks`);
+    /*
+    Animation di chuyển đĩa
+    Giai đoạn 1: Nhấc lên
+    Giai đoạn 2: Di chuyển ngang
+    Giai đoạn 3: Hạ xuống
+    */
+    async animateMove(diskNumber, from, to, executeMove = true) {
+        return new Promise((resolve) => {
+            const speed = hanoiLogic.getAnimationSpeed();
+            const fromContainer = document.getElementById(`rod-${from}-disks`);
+            const toContainer = document.getElementById(`rod-${to}-disks`);
 
-			// Tìm đĩa cần di chuyển
-			const disk = fromContainer.querySelector(`[data-disk="${diskNumber}"]`);
-			if (!disk) {
-				console.error(`Không tìm thấy đĩa ${diskNumber} trên cọc ${from}`);
-				resolve();
-				return;
-			}
+            const disk = fromContainer.querySelector(`[data-disk="${diskNumber}"]`);
+            if (!disk) {
+                console.error(`Không tìm thấy đĩa ${diskNumber} trên cọc ${from}`);
+                resolve();
+                return;
+            }
 
-			// Lấy vị trí ban đầu
-			const startRect = disk.getBoundingClientRect();
-			const stageRect = document.querySelector('.game-stage').getBoundingClientRect();
+            const startRect = disk.getBoundingClientRect();
+            const stageRect = document.querySelector('.game-stage').getBoundingClientRect();
 
-			// Tạo disk clone để animate
-			const cloneDisk = disk.cloneNode(true);
-			cloneDisk.style.position = 'fixed';
-			cloneDisk.style.left = `${startRect.left}px`;
-			cloneDisk.style.top = `${startRect.top}px`;
-			cloneDisk.style.width = `${startRect.width}px`;
-			cloneDisk.style.zIndex = '1000';
-			document.body.appendChild(cloneDisk);
+            // Tạo disk clone để animate
+            const cloneDisk = disk.cloneNode(true);
+            cloneDisk.style.position = 'fixed';
+            cloneDisk.style.left = `${startRect.left}px`;
+            cloneDisk.style.top = `${startRect.top}px`;
+            cloneDisk.style.width = `${startRect.width}px`;
+            cloneDisk.style.zIndex = '1000';
+            document.body.appendChild(cloneDisk);
 
-			// Ẩn disk gốc
-			disk.style.opacity = '0';
+            disk.style.opacity = '0';
 
-			// Tính toán vị trí đích
-			const toRect = toContainer.getBoundingClientRect();
+            const toRect = toContainer.getBoundingClientRect();
+            const poleTop = stageRect.top + 20;
+            const finalX = toRect.left + (toRect.width - startRect.width) / 2;
+            const numDisksBelow = toContainer.children.length;
+            const finalY = toRect.bottom - (numDisksBelow + 1) * this.diskHeight;
 
-			// Chiều cao để nhấc lên (cao hơn cột pole)
-			const poleTop = stageRect.top + 20; // Cao hơn đỉnh pole một chút
+            // GIAI ĐOẠN 1: Nhấc lên
+            cloneDisk.style.transition = `top ${speed / 3}ms ease-out`;
+            setTimeout(() => {
+                cloneDisk.style.top = `${poleTop}px`;
+            }, 50);
 
-			// Tính vị trí X đích (căn giữa cọc đích)
-			const finalX = toRect.left + (toRect.width - startRect.width) / 2;
+            // GIAI ĐOẠN 2: Di chuyển ngang
+            setTimeout(() => {
+                cloneDisk.style.transition = `left ${speed / 3}ms linear`;
+                cloneDisk.style.left = `${finalX}px`;
+            }, speed / 3 + 100);
 
-			// Tính vị trí Y đích (vị trí chính xác trên cọc đích)
-			const numDisksBelow = toContainer.children.length;
-			const finalY = toRect.bottom - (numDisksBelow + 1) * this.diskHeight;
+            // GIAI ĐOẠN 3: Hạ xuống
+            setTimeout(() => {
+                cloneDisk.style.transition = `top ${speed / 3}ms ease-in`;
+                cloneDisk.style.top = `${finalY}px`;
+            }, (speed * 2) / 3 + 150);
 
-			// GIAI ĐOẠN 1: Nhấc thẳng lên
-			cloneDisk.style.transition = `top ${speed / 3}ms ease-out`;
-			setTimeout(() => {
-				cloneDisk.style.top = `${poleTop}px`;
-			}, 50);
+            // Hoàn thành
+            setTimeout(() => {
+                cloneDisk.remove();
 
-			// GIAI ĐOẠN 2: Di chuyển ngang
-			setTimeout(() => {
-				cloneDisk.style.transition = `left ${speed / 3}ms linear`;
-				cloneDisk.style.left = `${finalX}px`;
-			}, speed / 3 + 100);
+                if (executeMove) {
+                    hanoiLogic.makeMove(from, to);
+                }
 
-			// GIAI ĐOẠN 3: Hạ thẳng xuống
-			setTimeout(() => {
-				cloneDisk.style.transition = `top ${speed / 3}ms ease-in`;
-				cloneDisk.style.top = `${finalY}px`;
-			}, (speed * 2) / 3 + 150);
+                this.renderGame();
+                this.updateStats();
 
-			// Hoàn thành animation
-			setTimeout(() => {
-				// Xóa clone
-				cloneDisk.remove();
+                resolve();
+            }, speed + 200);
+        });
+    }
 
-				// Thực hiện logic di chuyển nếu cần
-				if (executeMove) {
-					hanoiLogic.makeMove(from, to);
-				}
+    /*
+    Update hiển thị stack với animation
+    pop: Box bay lên và biến mất
+    push: Box rơi từ trên xuống
+    */
+    updateStackViews() {
+        ['A', 'B', 'C'].forEach(rod => {
+            const stack = hanoiLogic.getStack(rod);
+            const stackView = document.getElementById(`stack-view-${rod}`);
+            
+            // Lưu trạng thái cũ
+            const oldBoxes = Array.from(stackView.querySelectorAll('.stack-box'));
+            const oldCount = oldBoxes.length;
+            const newCount = stack.length;
+            
+            const speed = hanoiLogic.getAnimationSpeed() / 3;
+            
+            // Tính khoảng cách đến miệng stack
+            const stackHeight = 240;  // Chiều cao stack-view (giống CSS)
+            const boxHeight = 22;      // Chiều cao mỗi box (20px + 2px gap)
 
-				// Render lại
-				this.renderGame();
-				this.updateStats();
+            if (newCount < oldCount) {
+                // pop: Box bay lên đến miệng stack (đỉnh) rồi biến mất
+                const topBox = oldBoxes[oldBoxes.length - 1];
+                const currentHeight = oldCount * boxHeight;
+                const distanceToTop = stackHeight - currentHeight;  // Khoảng cách đến miệng
 
-				resolve();
-			}, speed + 200);
-		});
-	}
+                topBox.style.transition = `transform ${speed}ms ease-out, opacity ${speed}ms ease-out`;
+                topBox.style.transform = `translateY(-${distanceToTop}px)`; // Bay đến miệng
+                topBox.style.opacity = '0';
+                
+                setTimeout(() => {
+                    this.renderStackView(rod, stack);
+                }, speed);
+            } else if (newCount > oldCount) {
+                // push: Render box mới và rơi từ miệng stack xuống
+                this.renderStackView(rod, stack);
+                
+                const newBoxes = stackView.querySelectorAll('.stack-box');
+                const topBox = newBoxes[newBoxes.length - 1];
+                
+                if (topBox) {
+                    const newHeight = newCount * boxHeight;
+                    const distanceFromTop = stackHeight - newHeight;  // Khoảng cách từ miệng đến vị trí mới
 
-	/**
-	 * Update hiển thị stack với animation
-	 */
-	updateStackViews() {
-		['A', 'B', 'C'].forEach(rod => {
-			const stack = hanoiLogic.getStack(rod);
-			const stackView = document.getElementById(`stack-view-${rod}`);
-			
-			// Lấy tốc độ animation hiện tại
-			const speed = hanoiLogic.getAnimationSpeed();
-			const popDuration = speed / 3;  // Thời gian bay lên
-			const pushDuration = speed / 3; // Thời gian rơi xuống
-			
-			// Lưu trạng thái cũ để so sánh
-			const oldBoxes = Array.from(stackView.querySelectorAll('.stack-box'));
-			const oldValues = oldBoxes.map(box => parseInt(box.textContent));
-			
-			// So sánh để phát hiện thay đổi
-			const isAdded = stack.length > oldValues.length;
-			const isRemoved = stack.length < oldValues.length;
-			
-			// Tính khoảng cách đến đỉnh stack (chiều cao stack = 240px)
-			const stackHeight = 240;
-			const boxHeight = 22; // 20px + 2px gap
-			const currentHeight = oldBoxes.length * boxHeight;
-			const distanceToTop = stackHeight - currentHeight;
-			
-			if (isRemoved && oldBoxes.length > 0) {
-				// Animation POP: Box bay lên đến đỉnh stack rồi mới biến mất
-				const topBox = oldBoxes[oldBoxes.length - 1];
-				topBox.style.transition = `transform ${popDuration}ms ease-out, opacity ${popDuration / 2}ms ease-out ${popDuration / 2}ms`;
-				topBox.style.transform = `translateY(-${distanceToTop}px)`; // Bay đến đỉnh
-				topBox.style.opacity = '0';
-				
-				setTimeout(() => {
-					this.renderStackView(rod, stack);
-				}, popDuration);
-			} else if (isAdded) {
-				// Animation PUSH: Box rơi từ đỉnh stack xuống
-				// Render trước KHÔNG có transition
-				this.renderStackView(rod, stack);
-				
-				// Lấy box mới vừa được tạo
-				const newBoxes = stackView.querySelectorAll('.stack-box');
-				const topBox = newBoxes[newBoxes.length - 1];
-				
-				if (topBox) {
-					// Tính khoảng cách từ đỉnh stack đến vị trí mới
-					const newHeight = newBoxes.length * boxHeight;
-					const distanceFromTop = stackHeight - newHeight;
-					
-					// Bước 1: Set vị trí ban đầu (ở đỉnh stack, ẩn) KHÔNG có transition
-					topBox.style.transition = 'none';
-					topBox.style.transform = `translateY(-${distanceFromTop}px)`;
-					topBox.style.opacity = '0';
-					
-					// Bước 2: Force reflow
-					topBox.offsetHeight;
-					
-					// Bước 3: Bật transition và rơi xuống + hiện dần
-					requestAnimationFrame(() => {
-						topBox.style.transition = `transform ${pushDuration}ms ease-in, opacity ${pushDuration / 2}ms ease-in`;
-						topBox.style.transform = 'translateY(0)';
-						topBox.style.opacity = '1';
-					});
-				}
-			} else {
-				// Không có thay đổi hoặc reset hoàn toàn
-				this.renderStackView(rod, stack);
-			}
-		});
-	}
+                    // Bắt đầu từ miệng stack và rơi xuống
+                    topBox.style.transition = 'none';
+                    topBox.style.transform = `translateY(-${distanceFromTop}px)`;
+                    topBox.style.opacity = '0';
+                    
+                    // Force reflow
+                    topBox.offsetHeight;
+                    
+                    // Animate rơi xuống
+                    requestAnimationFrame(() => {
+                        topBox.style.transition = `transform ${speed}ms ease-in, opacity ${speed}ms ease-in`;
+                        topBox.style.transform = 'translateY(0)';
+                        topBox.style.opacity = '1';
+                    });
+                }
+            } else {
+                // Không thay đổi
+                this.renderStackView(rod, stack);
+            }
+        });
+    }
 
-    /**
-     * Helper: Render stack view không animation
-     */
+    // Render stack view đơn giản
     renderStackView(rod, stack) {
         const stackView = document.getElementById(`stack-view-${rod}`);
         stackView.innerHTML = '';
@@ -532,20 +436,18 @@ class HanoiUI {
         }
     }
 
-    // Lấy giá trị top từ algorithm (chỉ số phần tử trên cùng)
+    // Cập nhật giá trị Top
     updateTopValues() {
-    const topA = hanoiAlgorithm.stackA.getTop();
-    const topB = hanoiAlgorithm.stackB.getTop();
-    const topC = hanoiAlgorithm.stackC.getTop();
+        const topA = hanoiAlgorithm.stackA.getTop();
+        const topB = hanoiAlgorithm.stackB.getTop();
+        const topC = hanoiAlgorithm.stackC.getTop();
 
-    document.getElementById('top-value-A').textContent = topA;
-    document.getElementById('top-value-B').textContent = topB;
-    document.getElementById('top-value-C').textContent = topC;
-}
+        document.getElementById('top-value-A').textContent = topA;
+        document.getElementById('top-value-B').textContent = topB;
+        document.getElementById('top-value-C').textContent = topC;
+    }
 
-    /**
-     * Update thống kê
-     */
+    // Update thống kê
     updateStats() {
         const state = hanoiLogic.getState();
         document.getElementById('min-steps-display').textContent = state.minSteps;
@@ -553,9 +455,7 @@ class HanoiUI {
         this.updateTopValues();
     }
 
-    /**
-     * Reset game
-     */
+    // Reset game
     resetGame() {
         const numDisks = hanoiLogic.getState().numDisks;
         hanoiLogic.initGame(numDisks);
@@ -563,52 +463,41 @@ class HanoiUI {
         this.updateStats();
         hanoiAlgorithm.reset();
         
-        // Reset manual mode
         this.selectedDisk = null;
         this.selectedRod = null;
         this.clearDiskHighlights();
         
-        // Đổi text nút về ban đầu
         document.getElementById('btn-instant').textContent = 'Auto Solve';
         this.updateTopValues();
     }
 
-    /**
-     * Máy giải - Tự động giải từng bước với animation
-     */
+    // Auto Solve - Tự động giải từng bước với animation
     async toggleAutoPlay() {
         const state = hanoiLogic.getState();
         const btn = document.getElementById('btn-instant');
 
         if (state.isAutoPlaying) {
-            // Dừng máy giải
+            // Dừng
             state.isAutoPlaying = false;
             btn.textContent = 'Auto Solve';
         } else {
-            // Bắt đầu máy giải
+            // Bắt đầu
             state.isAutoPlaying = true;
             btn.textContent = 'Stop';
-            // Generate moves nếu chưa có
+            
             if (state.moves.length === 0) {
                 hanoiLogic.generateMoves();
             }
 
-            // Chạy auto
             while (state.isAutoPlaying && !hanoiLogic.isCompleted()) {
                 const move = hanoiLogic.getNextMove();
                 if (!move) break;
 
-                // Highlight code line
                 hanoiAlgorithm.highlightLine(move.line);
-
-                // Animate move (executeMove = true để thực hiện logic di chuyển)
                 await this.animateMove(move.disk, move.from, move.to, true);
-
-                // Đợi một chút trước bước tiếp theo
                 await this.sleep(100);
             }
 
-            // Hoàn thành
             state.isAutoPlaying = false;
             btn.textContent = 'Auto Solve';
             hanoiAlgorithm.highlightLine(0);
@@ -621,18 +510,14 @@ class HanoiUI {
         }
     }
 
-    /**
-     * Thực hiện bước tiếp theo
-     */
+    // Thực hiện bước tiếp theo
     async nextMove() {
         const state = hanoiLogic.getState();
 
-        // Generate moves nếu chưa có
         if (state.moves.length === 0) {
             hanoiLogic.generateMoves();
         }
 
-        // Kiểm tra đã hoàn thành chưa
         if (hanoiLogic.isCompleted()) {
             alert('Đã hoàn thành!');
             return;
@@ -644,13 +529,9 @@ class HanoiUI {
             return;
         }
 
-        // Highlight code
         hanoiAlgorithm.highlightLine(move.line);
-
-        // Animate (executeMove = true để thực hiện logic di chuyển)
         await this.animateMove(move.disk, move.from, move.to, true);
 
-        // Kiểm tra hoàn thành
         if (hanoiLogic.isCompleted()) {
             setTimeout(() => {
                 alert(`🎉 Hoàn thành!\nSố bước: ${state.currentSteps}\nTối thiểu: ${state.minSteps}`);
@@ -658,24 +539,15 @@ class HanoiUI {
         }
     }
 
-    /**
-     * Helper sleep function
-     */
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
-// =========================================================
-// KHỞI ĐỘNG ỨNG DỤNG
-// =========================================================
+// Khởi động ứng dụng
 document.addEventListener('DOMContentLoaded', () => {
-    // Khởi tạo logic
     hanoiLogic.initGame(5);
-
-    // Khởi tạo UI
     const ui = new HanoiUI();
     ui.init();
-
     console.log('🎮 Tower of Hanoi đã sẵn sàng!');
 });
