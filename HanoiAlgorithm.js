@@ -137,13 +137,13 @@ class HanoiAlgorithm {
     Hàm đệ quy - Trái tim của thuật toán Tháp Hà Nội
     Base case: n = 1 -> di chuyển trực tiếp
     Recursive case: 
-        1. Di chuyển (n-1) đĩa từ source -> auxiliary
-        2. Di chuyển đĩa lớn nhất từ source -> destination
-        3. Di chuyển (n-1) đĩa từ auxiliary -> destination
+        1 Di chuyển (n-1) đĩa từ source -> auxiliary
+        2 Di chuyển đĩa lớn nhất từ source -> destination
+        3 Di chuyển (n-1) đĩa từ auxiliary -> destination
      */
     hanoiRecursive(n, source, destination, auxiliary) {
         if (n === 1) {
-            // Base case: chỉ 1 đĩa → di chuyển trực tiếp
+            // Base case: chỉ 1 đĩa -> di chuyển trực tiếp
             this.moveDisk(source, destination, 2);
         } else {
             // Bước 1: Di chuyển (n-1) đĩa sang cọc trung gian
